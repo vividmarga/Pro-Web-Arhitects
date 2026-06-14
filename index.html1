@@ -1,0 +1,2492 @@
+# Code — Site Principal (index.html)
+
+**Fișier:** `index.html`  
+**Tip:** HTML single-file (2400+ linii)  
+**Deploy:** Cloudflare Worker la ruta `/`  
+**Limbi:** EN / RO / FR / DE
+
+## Descriere
+
+Site-ul principal al agenției Pro Web Architects. Conține toate secțiunile:
+
+| Secțiune | Descriere |
+|----------|-----------|
+| NAV | Fixed navbar cu language switcher + dark mode |
+| TICKER | Bandă animată cu servicii |
+| HERO | Headline mare + stats + CTA buttons |
+| SERVICES | 6 carduri servicii cu template modals |
+| PORTFOLIO | 8 proiecte cu SVG previews reale |
+| METHODOLOGY | 4 faze de lucru |
+| PRICING | 3 planuri (€500 / €2.500 / €8.000) |
+| TESTIMONIALS | Slider cu 4 testimoniale |
+| BLOG | 3 articole preview |
+| FAQ | 5 întrebări accordion |
+| CTA BANNER | Secțiune violet cu CTA |
+| CONTACT | Formular complet → Airtable |
+| FOOTER | Complet cu toate linkurile |
+
+## Features
+
+- 🌍 **Multilingv** — sistem i18n custom EN/RO/FR/DE
+- 🌙 **Dark Mode** — toggle complet
+- 📱 **Mobile Menu** — fullscreen cu animație
+- 📊 **Scroll Progress Bar** — indicator progres
+- 🎠 **Testimonial Slider** — responsive cu dots
+- 🖼️ **Template Modals** — demo vizual interactiv pentru fiecare serviciu
+- 📋 **Project Modals** — detalii proiect cu metrici și tech stack
+- ✅ **Form Validation** — client-side cu error messages
+
+## Cod Complet
+
+```html
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pro Web Architects — Monolithic Precision</title>
+<meta name="description" content="High-precision web engineering. Custom architectures that convert. No templates. No compromises."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "primary":"#3700b2","primary-container":"#4e0fea","primary-fixed":"#e5deff",
+      "on-primary":"#ffffff","on-primary-container":"#c4b9ff",
+      "secondary":"#1960a3","secondary-container":"#7db6ff","on-secondary":"#ffffff",
+      "surface":"#f9f9f9","surface-variant":"#e2e2e2","surface-container":"#eeeeee",
+      "surface-container-high":"#e8e8e8","surface-container-low":"#f3f3f3",
+      "surface-container-lowest":"#ffffff","on-surface":"#1b1b1b",
+      "on-surface-variant":"#484456","outline":"#797488","outline-variant":"#c9c3d9",
+      "tertiary":"#383838","tertiary-container":"#4f4f4f",
+    },
+    fontFamily:{"headline":["Inter","sans-serif"],"body":["Inter","sans-serif"],"label":["Space Grotesk","sans-serif"],"mono":["Roboto Mono","monospace"]},
+    borderRadius:{DEFAULT:"0px",lg:"0px",xl:"0px",full:"9999px"},
+  }}
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#3700b2;--primary-light:#4e0fea;--primary-fixed:#e5deff;
+  --secondary:#1960a3;--surface:#f9f9f9;--surface-low:#f3f3f3;
+  --on-surface:#1b1b1b;--on-surface-variant:#484456;
+  --outline-variant:#c9c3d9;
+}
+html{scroll-behavior:smooth}
+body{background:var(--surface);color:var(--on-surface);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+/* ── CURSOR ── */
+/* custom cursor removed */
+
+/* ── GRID BG ── */
+.arch-grid{background-image:radial-gradient(circle,#c9c3d9 1px,transparent 1px);background-size:40px 40px;opacity:.2}
+
+/* ── SHIMMER ── */
+.shimmer{position:relative;overflow:hidden}
+.shimmer::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:skewX(-20deg);transition:left .6s ease}
+.shimmer:hover::after{left:120%}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes scanline{0%{top:0}100%{top:100%}}
+
+.fade-up{animation:fadeUp .8s ease both}
+.fade-up-2{animation:fadeUp .8s .15s ease both}
+.fade-up-3{animation:fadeUp .8s .3s ease both}
+.fade-up-4{animation:fadeUp .8s .45s ease both}
+
+/* ── NAV ── */
+nav.main-nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(249,249,249,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--outline-variant)}
+.dark nav.main-nav{background:rgba(10,10,10,.92)}
+
+/* ── TICKER ── */
+.ticker-wrap{overflow:hidden;white-space:nowrap;border-top:1px solid var(--outline-variant);border-bottom:1px solid var(--outline-variant)}
+.ticker-inner{display:inline-flex;animation:ticker 30s linear infinite}
+.ticker-inner:hover{animation-play-state:paused}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--primary)}
+
+/* ── CARDS ── */
+.project-card{border:1px solid var(--outline-variant);transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.project-card:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.project-card:hover .card-num{color:rgba(255,255,255,.15)}
+.project-card:hover .card-tag{color:rgba(255,255,255,.6)}
+.project-card:hover .card-arrow{color:#fff}
+
+/* ── SERVICE CARDS ── */
+.service-card{border:1px solid var(--outline-variant);transition:all .35s ease;cursor:pointer}
+.service-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(55,0,178,.12);border-color:var(--primary)}
+.service-card:hover .service-icon{background:var(--primary);color:#fff}
+
+/* ── PRICE CARDS ── */
+.price-card{border:1px solid var(--outline-variant);transition:all .3s ease}
+.price-card.featured{background:var(--primary);color:#fff;border-color:var(--primary)}
+.price-card.featured .price-feature{color:rgba(255,255,255,.8)}
+.price-card:not(.featured):hover{border-color:var(--primary);transform:translateY(-4px)}
+
+/* ── LANG SWITCHER ── */
+.lang-btn{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border:1px solid transparent;transition:all .2s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ── ACCORDION ── */
+.faq-content{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.faq-content.open{max-height:300px}
+.faq-toggle{transition:transform .3s ease}
+.faq-item.open .faq-toggle{transform:rotate(45deg)}
+
+/* ── MOBILE MENU ── */
+.mobile-menu{position:fixed;inset:0;background:var(--surface);z-index:99;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.mobile-menu.open{transform:translateX(0)}
+
+/* ── TEMPLATE MODAL ── */
+.template-modal{position:fixed;inset:0;background:rgba(10,10,10,.9);z-index:200;display:none;align-items:center;justify-content:center}
+.template-modal.show{display:flex}
+
+/* ── TESTIMONIAL ── */
+.testimonial-track{display:flex;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+
+/* ── SCROLL PROGRESS ── */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:var(--primary);z-index:200;transition:width .1s linear}
+
+/* ── DARK MODE ── */
+.dark body{background:#0a0a0a;color:#f1f1f1}
+.dark .arch-grid{background-image:radial-gradient(circle,rgba(255,255,255,.08) 1px,transparent 1px)}
+.dark .project-card{border-color:rgba(255,255,255,.08);background:#111}
+.dark .project-card:hover{background:var(--primary)}
+.dark .service-card{background:#111;border-color:rgba(255,255,255,.08)}
+.dark .price-card:not(.featured){background:#111;border-color:rgba(255,255,255,.08)}
+.dark .faq-item{border-color:rgba(255,255,255,.08)}
+.dark input,.dark textarea,.dark select{background:#1a1a1a;border-color:rgba(255,255,255,.1);color:#f1f1f1}
+
+/* ── UTILS ── */
+.text-gradient{background:linear-gradient(135deg,var(--primary),var(--primary-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.border-primary-soft{border-color:rgba(55,0,178,.2)}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════ -->
+<nav class="main-nav">
+  <div class="max-w-[1440px] mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-primary flex items-center justify-center text-white font-black text-xl relative">
+        P<div class="absolute inset-0 border border-secondary-container opacity-30"></div>
+      </div>
+      <span class="font-black tracking-tighter text-on-surface uppercase text-lg hidden sm:block">Pro Web Architects</span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="hidden lg:flex items-center gap-8">
+      <a href="#services" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_services">Services</a>
+      <a href="#portfolio" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_portfolio">Portfolio</a>
+      <a href="#methodology" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_methodology">Methodology</a>
+      <a href="#pricing" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_pricing">Pricing</a>
+      <a href="#blog" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_blog">Blog</a>
+      <a href="#contact" class="nav-link font-label text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" data-key="nav_contact">Contact</a>
+    </div>
+
+    <!-- Right actions -->
+    <div class="flex items-center gap-3">
+      <!-- Language switcher -->
+      <div class="hidden md:flex items-center gap-1 border border-outline-variant px-2 py-1">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <span class="text-outline-variant text-xs">|</span>
+        <button class="lang-btn" onclick="setLang('ro')">RO</button>
+        <span class="text-outline-variant text-xs">|</span>
+        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+        <span class="text-outline-variant text-xs">|</span>
+        <button class="lang-btn" onclick="setLang('de')">DE</button>
+      </div>
+      <!-- Dark mode -->
+      <button onclick="toggleDark()" class="w-9 h-9 flex items-center justify-center border border-outline-variant hover:border-primary transition-colors" title="Toggle dark mode">
+        <span class="material-symbols-outlined text-base" id="darkIcon">dark_mode</span>
+      </button>
+      <!-- CTA -->
+      <a href="#contact" class="shimmer hidden sm:block px-5 py-2 bg-primary text-white font-label text-xs uppercase tracking-widest hover:bg-primary-container transition-colors" data-key="nav_hire">Start a Project</a>
+      <!-- Hamburger -->
+      <button class="lg:hidden w-9 h-9 flex items-center justify-center" onclick="toggleMobileMenu()">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="flex flex-col h-full px-8 pt-24 pb-12">
+    <button onclick="toggleMobileMenu()" class="absolute top-6 right-6"><span class="material-symbols-outlined text-2xl">close</span></button>
+    <div class="space-y-6 flex-1">
+      <a href="#services" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_services">Services</a>
+      <a href="#portfolio" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_portfolio">Portfolio</a>
+      <a href="#methodology" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_methodology">Methodology</a>
+      <a href="#pricing" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_pricing">Pricing</a>
+      <a href="#blog" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_blog">Blog</a>
+      <a href="#contact" onclick="toggleMobileMenu()" class="block font-black text-4xl uppercase tracking-tighter hover:text-primary transition-colors" data-key="nav_contact">Contact</a>
+    </div>
+    <div class="flex gap-2 mt-8">
+      <button class="lang-btn active" onclick="setLang('en');toggleMobileMenu()">EN</button>
+      <button class="lang-btn" onclick="setLang('ro');toggleMobileMenu()">RO</button>
+      <button class="lang-btn" onclick="setLang('fr');toggleMobileMenu()">FR</button>
+      <button class="lang-btn" onclick="setLang('de');toggleMobileMenu()">DE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TICKER
+════════════════════════════════════════════════════ -->
+<div class="ticker-wrap mt-[73px] py-3 bg-surface-container-low">
+  <div class="ticker-inner">
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Custom Architecture</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">E-Commerce Solutions</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">SaaS Platforms</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Landing Pages</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Performance First</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Sub 1s Load Time</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Custom Architecture</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">E-Commerce Solutions</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">SaaS Platforms</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Landing Pages</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Performance First</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+    <span class="ticker-item font-mono text-xs uppercase tracking-widest text-on-surface-variant px-12">Sub 1s Load Time</span>
+    <span class="ticker-item font-mono text-xs text-primary px-4">◆</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════ -->
+<section class="relative min-h-[92vh] flex flex-col justify-center bg-surface overflow-hidden px-6 lg:px-24 py-24">
+  <div class="absolute inset-0 arch-grid pointer-events-none"></div>
+  <!-- Accent line -->
+  <div class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-transparent via-primary to-transparent opacity-30"></div>
+
+  <div class="max-w-[1440px] mx-auto w-full relative z-10">
+    <div class="max-w-3xl">
+      <div class="fade-up flex items-center gap-4 mb-8">
+        <span class="sec-label bg-primary/5 px-3 py-1" data-key="hero_badge">V.4.0 Engine · Now Accepting Projects</span>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500" style="animation:pulse-dot 2s infinite"></span>
+          <span class="font-mono text-xs text-on-surface-variant" data-key="hero_status">Available</span>
+        </div>
+      </div>
+
+      <h1 class="fade-up-2 font-black leading-[.88] tracking-tighter text-on-surface uppercase mb-8" style="font-size:clamp(2.8rem,6vw,7rem)">
+        <span data-key="hero_line1">Architecting</span><br/>
+        <span class="text-primary" data-key="hero_line2">Digital</span><br/>
+        <span data-key="hero_line3">Legacies.</span>
+      </h1>
+
+      <p class="fade-up-3 text-lg md:text-xl font-light text-on-surface-variant max-w-xl mb-12 leading-relaxed" data-key="hero_sub">
+        High-precision web engineering for modern brands. We don't build websites — we design monolithic systems that endure and convert.
+      </p>
+
+      <!-- Stats row -->
+      <div class="fade-up-3 flex flex-wrap gap-10 mb-12">
+        <div>
+          <div class="font-black text-3xl tracking-tighter text-on-surface">20+</div>
+          <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mt-1" data-key="stat_projects">Projects Shipped</div>
+        </div>
+        <div>
+          <div class="font-black text-3xl tracking-tighter text-primary">&lt;1s</div>
+          <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mt-1" data-key="stat_load">Load Time</div>
+        </div>
+        <div>
+          <div class="font-black text-3xl tracking-tighter text-on-surface">99.9%</div>
+          <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mt-1" data-key="stat_uptime">Uptime SLA</div>
+        </div>
+        <div>
+          <div class="font-black text-3xl tracking-tighter text-on-surface">5★</div>
+          <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mt-1" data-key="stat_rating">Client Rating</div>
+        </div>
+      </div>
+
+      <div class="fade-up-4 flex flex-wrap gap-4">
+        <a href="#contact" class="shimmer px-10 py-5 bg-primary text-white font-label uppercase tracking-widest text-sm flex items-center gap-3 hover:bg-primary-container transition-colors">
+          <span data-key="hero_cta1">Start a Project</span>
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </a>
+        <a href="#portfolio" class="shimmer px-10 py-5 bg-surface-container-low border border-outline-variant text-on-surface font-label uppercase tracking-widest text-sm hover:border-primary transition-colors">
+          <span data-key="hero_cta2">View Portfolio</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero card — absolute, only visible on very wide screens, never overlaps text -->
+    <div class="hidden 2xl:block absolute top-1/2 right-0 -translate-y-1/2 w-80 fade-up-4">
+      <div class="bg-surface-container-lowest border border-outline-variant p-6 relative">
+        <div class="absolute -top-4 -left-4 bg-white border border-outline-variant shadow-lg px-4 py-3 z-10">
+          <span class="sec-label block mb-1">Status: Operational</span>
+          <span class="font-black text-sm uppercase">99.9% Uptime</span>
+        </div>
+        <div class="bg-on-surface rounded-none overflow-hidden mt-6">
+          <div class="bg-surface-container-high px-3 py-2 flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+            <div class="flex-1 bg-surface-container-lowest mx-2 px-2 py-0.5 text-xs font-mono text-on-surface-variant">prowebarchitects.dev</div>
+          </div>
+          <div class="p-4 space-y-2">
+            <div class="h-2 bg-primary/30 w-3/4"></div>
+            <div class="h-2 bg-on-surface/10 w-full"></div>
+            <div class="h-2 bg-on-surface/10 w-5/6"></div>
+            <div class="h-8 bg-primary/20 w-full mt-4"></div>
+            <div class="grid grid-cols-3 gap-2 mt-3">
+              <div class="h-12 bg-on-surface/5 border border-primary/20"></div>
+              <div class="h-12 bg-primary/10"></div>
+              <div class="h-12 bg-on-surface/5 border border-primary/20"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          <div class="bg-surface-container-low p-2 text-center">
+            <div class="font-black text-emerald-500 text-lg">98</div>
+            <div class="font-mono text-[9px] text-on-surface-variant uppercase">Perf</div>
+          </div>
+          <div class="bg-surface-container-low p-2 text-center">
+            <div class="font-black text-emerald-500 text-lg">100</div>
+            <div class="font-mono text-[9px] text-on-surface-variant uppercase">SEO</div>
+          </div>
+          <div class="bg-surface-container-low p-2 text-center">
+            <div class="font-black text-emerald-500 text-lg">97</div>
+            <div class="font-mono text-[9px] text-on-surface-variant uppercase">A11y</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+    <div class="w-px h-12 bg-on-surface-variant"></div>
+    <span class="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SERVICES
+════════════════════════════════════════════════════ -->
+<section id="services" class="py-32 px-6 lg:px-24 bg-surface-container-low">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+      <div>
+        <span class="sec-label block mb-4" data-key="services_label">What We Build</span>
+        <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter leading-[.9]" data-key="services_title">Our<br/>Services</h2>
+      </div>
+      <p class="font-label text-sm text-on-surface-variant max-w-sm leading-relaxed" data-key="services_sub">Every project is engineered from scratch. No page builders. No compromises.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- E-Commerce -->
+      <div class="service-card bg-surface-container-lowest p-8 group" onclick="openTemplate('ecommerce')">
+        <div class="service-icon w-14 h-14 bg-primary/10 flex items-center justify-center mb-8 transition-all duration-300">
+          <span class="material-symbols-outlined text-primary">shopping_cart</span>
+        </div>
+        <h3 class="font-black text-2xl uppercase mb-4" data-key="svc_ecom_title">E-Commerce</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="svc_ecom_desc">Custom storefronts with real-time inventory, advanced filtering, and conversion-optimized checkout flows. No Shopify limitations.</p>
+        <div class="flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+          <span data-key="see_template">See Template</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Landing Page -->
+      <div class="service-card bg-surface-container-lowest p-8 group" onclick="openTemplate('landing')">
+        <div class="service-icon w-14 h-14 bg-primary/10 flex items-center justify-center mb-8 transition-all duration-300">
+          <span class="material-symbols-outlined text-primary">rocket_launch</span>
+        </div>
+        <h3 class="font-black text-2xl uppercase mb-4" data-key="svc_land_title">Landing Pages</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="svc_land_desc">High-converting campaign pages engineered for speed and impact. A/B testing ready. Perfect Lighthouse scores.</p>
+        <div class="flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+          <span data-key="see_template">See Template</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- SaaS -->
+      <div class="service-card bg-surface-container-lowest p-8 group" onclick="openTemplate('saas')">
+        <div class="service-icon w-14 h-14 bg-primary/10 flex items-center justify-center mb-8 transition-all duration-300">
+          <span class="material-symbols-outlined text-primary">hub</span>
+        </div>
+        <h3 class="font-black text-2xl uppercase mb-4" data-key="svc_saas_title">SaaS Platforms</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="svc_saas_desc">Full-stack web applications with auth, dashboards, billing integrations, and API architecture. Built to scale.</p>
+        <div class="flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+          <span data-key="see_template">See Template</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Corporate -->
+      <div class="service-card bg-surface-container-lowest p-8 group" onclick="openTemplate('corporate')">
+        <div class="service-icon w-14 h-14 bg-primary/10 flex items-center justify-center mb-8 transition-all duration-300">
+          <span class="material-symbols-outlined text-primary">business</span>
+        </div>
+        <h3 class="font-black text-2xl uppercase mb-4" data-key="svc_corp_title">Corporate Sites</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="svc_corp_desc">Enterprise-grade presentation sites with CMS integration, multilingual support, and GDPR-compliant architecture.</p>
+        <div class="flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+          <span data-key="see_template">See Template</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Portfolio -->
+      <div class="service-card bg-surface-container-lowest p-8 group" onclick="openTemplate('portfolio')">
+        <div class="service-icon w-14 h-14 bg-primary/10 flex items-center justify-center mb-8 transition-all duration-300">
+          <span class="material-symbols-outlined text-primary">palette</span>
+        </div>
+        <h3 class="font-black text-2xl uppercase mb-4" data-key="svc_port_title">Portfolio Sites</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="svc_port_desc">Visually striking portfolio systems for creatives and agencies. Motion-rich, memorable, and fast.</p>
+        <div class="flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+          <span data-key="see_template">See Template</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Custom CTA card -->
+      <div class="bg-primary p-8 flex flex-col justify-between">
+        <div>
+          <h3 class="font-black text-2xl uppercase text-white mb-4" data-key="svc_custom_title">Something Else?</h3>
+          <p class="text-on-primary-container text-sm leading-relaxed mb-6" data-key="svc_custom_desc">Have a unique project in mind? We love complex challenges. Let's architect something unprecedented together.</p>
+        </div>
+        <a href="#contact" class="shimmer inline-flex items-center gap-3 px-6 py-3 border border-white/30 text-white font-label text-xs uppercase tracking-widest hover:bg-white hover:text-primary transition-all">
+          <span data-key="svc_custom_cta">Discuss Your Idea</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PORTFOLIO
+════════════════════════════════════════════════════ -->
+<section id="portfolio" class="py-32 px-6 lg:px-24 bg-surface">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+      <div>
+        <span class="sec-label block mb-4" data-key="port_label">Archive 2024–2025</span>
+        <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter" data-key="port_title">The Big 20</h2>
+      </div>
+      <p class="font-label text-sm text-on-surface-variant max-w-xs leading-loose" data-key="port_sub">A curated selection of industrial-grade web applications and high-fidelity interfaces.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-outline-variant">
+
+      <!-- 01 Titan Protocol — Fintech Dashboard -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('titan')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">01</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#0d0d1a]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#0d0d1a"/>
+            <rect x="0" y="0" width="80" height="225" fill="#111128"/>
+            <rect x="10" y="20" width="60" height="8" rx="2" fill="#3700b2" opacity=".8"/>
+            <rect x="10" y="38" width="60" height="6" rx="2" fill="#ffffff" opacity=".1"/>
+            <rect x="10" y="52" width="60" height="6" rx="2" fill="#ffffff" opacity=".1"/>
+            <rect x="10" y="66" width="60" height="6" rx="2" fill="#3700b2" opacity=".4"/>
+            <rect x="10" y="80" width="60" height="6" rx="2" fill="#ffffff" opacity=".1"/>
+            <rect x="10" y="94" width="60" height="6" rx="2" fill="#ffffff" opacity=".1"/>
+            <rect x="90" y="12" width="300" height="20" fill="#1a1a35"/>
+            <text x="98" y="25" fill="#ffffff" font-size="8" font-family="monospace" opacity=".6">TITAN PROTOCOL · DASHBOARD</text>
+            <rect x="90" y="40" width="90" height="50" fill="#111128" stroke="#3700b2" stroke-width=".5"/>
+            <text x="98" y="54" fill="#c4b9ff" font-size="7" font-family="monospace">BALANCE</text>
+            <text x="98" y="68" fill="#ffffff" font-size="11" font-family="monospace" font-weight="bold">$2.4M</text>
+            <text x="98" y="80" fill="#4ade80" font-size="7" font-family="monospace">▲ +12.4%</text>
+            <rect x="190" y="40" width="90" height="50" fill="#111128" stroke="#3700b2" stroke-width=".5"/>
+            <text x="198" y="54" fill="#c4b9ff" font-size="7" font-family="monospace">VOLUME</text>
+            <text x="198" y="68" fill="#ffffff" font-size="11" font-family="monospace" font-weight="bold">8,291</text>
+            <text x="198" y="80" fill="#4ade80" font-size="7" font-family="monospace">TXN TODAY</text>
+            <rect x="290" y="40" width="90" height="50" fill="#3700b2" stroke="#4e0fea" stroke-width=".5"/>
+            <text x="298" y="54" fill="#c4b9ff" font-size="7" font-family="monospace">UPTIME</text>
+            <text x="298" y="68" fill="#ffffff" font-size="11" font-family="monospace" font-weight="bold">99.9%</text>
+            <text x="298" y="80" fill="#c4b9ff" font-size="7" font-family="monospace">SLA MET</text>
+            <rect x="90" y="100" width="290" height="60" fill="#111128" stroke="#3700b2" stroke-width=".3"/>
+            <text x="98" y="113" fill="#c4b9ff" font-size="7" font-family="monospace">TRANSACTION FLOW — 30D</text>
+            <polyline points="98,150 120,138 140,142 165,128 185,133 210,120 230,124 255,112 275,118 300,105 320,110 345,98 365,103 380,95" fill="none" stroke="#3700b2" stroke-width="1.5"/>
+            <polyline points="98,150 120,138 140,142 165,128 185,133 210,120 230,124 255,112 275,118 300,105 320,110 345,98 365,103 380,95 380,160 98,160" fill="#3700b2" opacity=".15"/>
+            <rect x="90" y="170" width="140" height="44" fill="#111128" stroke="#3700b2" stroke-width=".3"/>
+            <text x="98" y="183" fill="#c4b9ff" font-size="7" font-family="monospace">RECENT TXN</text>
+            <rect x="98" y="188" width="120" height="5" rx="1" fill="#ffffff" opacity=".08"/>
+            <rect x="98" y="197" width="90" height="5" rx="1" fill="#ffffff" opacity=".08"/>
+            <rect x="98" y="206" width="110" height="5" rx="1" fill="#ffffff" opacity=".08"/>
+            <rect x="240" y="170" width="140" height="44" fill="#3700b2" opacity=".2" stroke="#3700b2" stroke-width=".3"/>
+            <text x="248" y="183" fill="#c4b9ff" font-size="7" font-family="monospace">RISK SCORE</text>
+            <rect x="248" y="188" width="50" height="8" rx="1" fill="#4ade80" opacity=".8"/>
+            <text x="251" y="196" fill="#fff" font-size="6" font-family="monospace">LOW · 2.1%</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Titan Protocol</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">Fintech / Backend Scalability</p>
+      </div>
+
+      <!-- 02 Ether Engine — E-Commerce -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('ether')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">02</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#fafafa]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#fafafa"/>
+            <rect x="0" y="0" width="400" height="32" fill="#ffffff" stroke="#e5e7eb" stroke-width=".5"/>
+            <rect x="10" y="10" width="40" height="12" rx="1" fill="#1960a3"/>
+            <text x="15" y="20" fill="#fff" font-size="7" font-family="monospace" font-weight="bold">ETHER</text>
+            <text x="120" y="20" fill="#6b7280" font-size="7" font-family="monospace">Shop</text>
+            <text x="165" y="20" fill="#6b7280" font-size="7" font-family="monospace">Collections</text>
+            <text x="220" y="20" fill="#6b7280" font-size="7" font-family="monospace">Sale</text>
+            <rect x="340" y="8" width="50" height="16" rx="1" fill="#1960a3"/>
+            <text x="352" y="19" fill="#fff" font-size="7" font-family="monospace">Cart 3</text>
+            <rect x="8" y="40" width="120" height="140" rx="1" fill="#f3f4f6" stroke="#e5e7eb" stroke-width=".5"/>
+            <rect x="16" y="52" width="104" height="60" rx="1" fill="#dde8f8"/>
+            <rect x="30" y="65" width="76" height="34" rx="12" fill="#1960a3" opacity=".15"/>
+            <text x="46" y="87" fill="#1960a3" font-size="18" font-family="monospace">👟</text>
+            <text x="16" y="128" fill="#111" font-size="8" font-family="monospace" font-weight="bold">Air Max Pro</text>
+            <text x="16" y="140" fill="#1960a3" font-size="9" font-family="monospace" font-weight="bold">$129.00</text>
+            <rect x="16" y="150" width="104" height="20" rx="1" fill="#1960a3"/>
+            <text x="44" y="163" fill="#fff" font-size="7" font-family="monospace">Add to Cart</text>
+            <rect x="138" y="40" width="120" height="140" rx="1" fill="#f3f4f6" stroke="#e5e7eb" stroke-width=".5"/>
+            <rect x="146" y="52" width="104" height="60" rx="1" fill="#fce7f3"/>
+            <text x="182" y="87" fill="#be185d" font-size="18" font-family="monospace">👜</text>
+            <text x="146" y="128" fill="#111" font-size="8" font-family="monospace" font-weight="bold">Luxe Bag</text>
+            <text x="146" y="140" fill="#1960a3" font-size="9" font-family="monospace" font-weight="bold">$249.00</text>
+            <rect x="146" y="150" width="104" height="20" rx="1" fill="#1960a3"/>
+            <text x="174" y="163" fill="#fff" font-size="7" font-family="monospace">Add to Cart</text>
+            <rect x="268" y="40" width="122" height="140" rx="1" fill="#f0fdf4" stroke="#bbf7d0" stroke-width=".5"/>
+            <rect x="276" y="48" width="106" height="16" rx="1" fill="#dcfce7"/>
+            <text x="284" y="59" fill="#15803d" font-size="7" font-family="monospace">🛒 3 items · $487</text>
+            <text x="276" y="80" fill="#374151" font-size="6" font-family="monospace">Air Max Pro × 1</text>
+            <text x="336" y="80" fill="#111" font-size="6" font-family="monospace">$129</text>
+            <text x="276" y="93" fill="#374151" font-size="6" font-family="monospace">Luxe Bag × 1</text>
+            <text x="336" y="93" fill="#111" font-size="6" font-family="monospace">$249</text>
+            <text x="276" y="106" fill="#374151" font-size="6" font-family="monospace">Cap × 1</text>
+            <text x="336" y="106" fill="#111" font-size="6" font-family="monospace">$109</text>
+            <line x1="276" y1="112" x2="382" y2="112" stroke="#e5e7eb" stroke-width=".5"/>
+            <text x="276" y="124" fill="#111" font-size="7" font-family="monospace" font-weight="bold">Total</text>
+            <text x="330" y="124" fill="#1960a3" font-size="8" font-family="monospace" font-weight="bold">$487</text>
+            <rect x="276" y="130" width="106" height="20" rx="1" fill="#1960a3"/>
+            <text x="300" y="143" fill="#fff" font-size="7" font-family="monospace">Checkout →</text>
+            <rect x="276" y="155" width="106" height="14" rx="1" fill="#f3f4f6" stroke="#e5e7eb" stroke-width=".5"/>
+            <text x="296" y="165" fill="#6b7280" font-size="6" font-family="monospace">🔒 Secure · Free Ship</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Ether Engine</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">E-Commerce / Real-time Inventory</p>
+      </div>
+
+      <!-- 03 Monolith OS — Design System -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('monolith')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">03</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#f8f8f8]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#f8f8f8"/>
+            <rect x="0" y="0" width="100" height="225" fill="#1b1b1b"/>
+            <text x="12" y="22" fill="#ffffff" font-size="8" font-family="monospace" font-weight="bold" opacity=".9">MONOLITH OS</text>
+            <text x="12" y="38" fill="#9ca3af" font-size="6" font-family="monospace">Design System v3</text>
+            <text x="12" y="58" fill="#3700b2" font-size="6" font-family="monospace">▸ Colors</text>
+            <text x="12" y="72" fill="#ffffff" font-size="6" font-family="monospace" opacity=".6">▸ Typography</text>
+            <text x="12" y="86" fill="#ffffff" font-size="6" font-family="monospace" opacity=".6">▸ Components</text>
+            <text x="12" y="100" fill="#ffffff" font-size="6" font-family="monospace" opacity=".6">▸ Patterns</text>
+            <text x="12" y="114" fill="#ffffff" font-size="6" font-family="monospace" opacity=".6">▸ Icons</text>
+            <text x="12" y="128" fill="#ffffff" font-size="6" font-family="monospace" opacity=".6">▸ Motion</text>
+            <rect x="108" y="10" width="284" height="205" fill="#ffffff" stroke="#e5e7eb" stroke-width=".5"/>
+            <text x="118" y="26" fill="#111" font-size="9" font-family="monospace" font-weight="bold">Color Tokens</text>
+            <rect x="118" y="32" width="20" height="20" rx="2" fill="#3700b2"/>
+            <rect x="142" y="32" width="20" height="20" rx="2" fill="#4e0fea"/>
+            <rect x="166" y="32" width="20" height="20" rx="2" fill="#c4b9ff"/>
+            <rect x="190" y="32" width="20" height="20" rx="2" fill="#e5deff"/>
+            <rect x="214" y="32" width="20" height="20" rx="2" fill="#1960a3"/>
+            <rect x="238" y="32" width="20" height="20" rx="2" fill="#1b1b1b"/>
+            <rect x="262" y="32" width="20" height="20" rx="2" fill="#484456"/>
+            <text x="118" y="68" fill="#111" font-size="9" font-family="monospace" font-weight="bold">Components</text>
+            <rect x="118" y="74" width="70" height="20" rx="0" fill="#3700b2"/>
+            <text x="133" y="87" fill="#fff" font-size="7" font-family="monospace">Primary</text>
+            <rect x="196" y="74" width="70" height="20" rx="0" fill="#f8f8f8" stroke="#3700b2" stroke-width="1"/>
+            <text x="211" y="87" fill="#3700b2" font-size="7" font-family="monospace">Outline</text>
+            <rect x="118" y="100" width="148" height="28" rx="0" fill="#f8f8f8" stroke="#e5e7eb" stroke-width=".5"/>
+            <text x="128" y="112" fill="#6b7280" font-size="7" font-family="monospace">Input field...</text>
+            <line x1="118" y1="124" x2="266" y2="124" stroke="#3700b2" stroke-width="1.5"/>
+            <text x="118" y="144" fill="#111" font-size="9" font-family="monospace" font-weight="bold">Typography Scale</text>
+            <text x="118" y="160" fill="#111" font-size="14" font-family="monospace" font-weight="bold">Heading XL</text>
+            <text x="118" y="174" fill="#111" font-size="9" font-family="monospace">Body Regular — 16px Inter</text>
+            <text x="118" y="186" fill="#6b7280" font-size="7" font-family="monospace">Caption · Roboto Mono · 12px</text>
+            <text x="118" y="200" fill="#3700b2" font-size="7" font-family="monospace">LABEL · SPACE GROTESK · 10px</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Monolith OS</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">System Design / Component Library</p>
+      </div>
+
+      <!-- 04 Hyperion Core — Large Card -->
+      <div class="project-card md:col-span-2 border-r border-b p-8 group cursor-pointer" onclick="openProject('hyperion')">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div>
+            <div class="mb-6 flex justify-between items-start">
+              <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">04</span>
+            </div>
+            <h3 class="font-black text-3xl uppercase mb-4 transition-colors">Hyperion Core</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed mb-6 transition-colors">Next-gen dashboard for aerospace logistics. 60fps data visualization. Built for 10M+ concurrent data points.</p>
+            <span class="inline-flex items-center gap-2 px-5 py-2 border border-primary text-primary font-label text-xs uppercase tracking-widest group-hover:border-white group-hover:text-white transition-colors">
+              Case Study <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </span>
+          </div>
+          <div class="aspect-video overflow-hidden bg-[#050510]">
+            <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+              <rect width="300" height="180" fill="#050510"/>
+              <rect x="0" y="0" width="300" height="24" fill="#0d0d2b"/>
+              <text x="10" y="15" fill="#c4b9ff" font-size="7" font-family="monospace">HYPERION CORE · AEROSPACE OPS</text>
+              <circle cx="150" cy="100" r="60" fill="none" stroke="#3700b2" stroke-width=".5" opacity=".4"/>
+              <circle cx="150" cy="100" r="40" fill="none" stroke="#3700b2" stroke-width=".5" opacity=".6"/>
+              <circle cx="150" cy="100" r="20" fill="#3700b2" opacity=".3"/>
+              <circle cx="150" cy="100" r="4" fill="#c4b9ff"/>
+              <circle cx="120" cy="72" r="4" fill="#4ade80"/>
+              <circle cx="185" cy="85" r="3" fill="#facc15"/>
+              <circle cx="168" cy="128" r="3" fill="#4ade80"/>
+              <circle cx="108" cy="118" r="3" fill="#f87171"/>
+              <line x1="150" y1="100" x2="120" y2="72" stroke="#4ade80" stroke-width=".5" stroke-dasharray="3,2"/>
+              <line x1="150" y1="100" x2="185" y2="85" stroke="#facc15" stroke-width=".5" stroke-dasharray="3,2"/>
+              <line x1="150" y1="100" x2="168" y2="128" stroke="#4ade80" stroke-width=".5" stroke-dasharray="3,2"/>
+              <line x1="150" y1="100" x2="108" y2="118" stroke="#f87171" stroke-width=".5" stroke-dasharray="3,2"/>
+              <rect x="8" y="30" width="60" height="30" fill="#0d0d2b" stroke="#3700b2" stroke-width=".3"/>
+              <text x="14" y="42" fill="#9ca3af" font-size="5" font-family="monospace">ACTIVE</text>
+              <text x="14" y="53" fill="#4ade80" font-size="10" font-family="monospace" font-weight="bold">247</text>
+              <rect x="8" y="68" width="60" height="30" fill="#0d0d2b" stroke="#3700b2" stroke-width=".3"/>
+              <text x="14" y="80" fill="#9ca3af" font-size="5" font-family="monospace">ALERTS</text>
+              <text x="14" y="91" fill="#f87171" font-size="10" font-family="monospace" font-weight="bold">3</text>
+              <rect x="232" y="30" width="60" height="30" fill="#3700b2" opacity=".4" stroke="#3700b2" stroke-width=".3"/>
+              <text x="238" y="42" fill="#c4b9ff" font-size="5" font-family="monospace">LATENCY</text>
+              <text x="238" y="53" fill="#ffffff" font-size="10" font-family="monospace" font-weight="bold">0ms</text>
+              <rect x="232" y="68" width="60" height="30" fill="#0d0d2b" stroke="#3700b2" stroke-width=".3"/>
+              <text x="238" y="80" fill="#9ca3af" font-size="5" font-family="monospace">UPTIME</text>
+              <text x="238" y="91" fill="#4ade80" font-size="10" font-family="monospace" font-weight="bold">99.9%</text>
+              <rect x="8" y="148" width="284" height="24" fill="#0d0d2b" stroke="#3700b2" stroke-width=".3"/>
+              <circle cx="18" cy="160" r="3" fill="#4ade80"/>
+              <text x="26" y="163" fill="#9ca3af" font-size="5" font-family="monospace">FLT-2041 · ON ROUTE</text>
+              <circle cx="120" cy="160" r="3" fill="#facc15"/>
+              <text x="128" y="163" fill="#9ca3af" font-size="5" font-family="monospace">FLT-1887 · DELAYED</text>
+              <circle cx="220" cy="160" r="3" fill="#f87171"/>
+              <text x="228" y="163" fill="#9ca3af" font-size="5" font-family="monospace">FLT-3310 · ALERT</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 05 Atlas Global — Logistics -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('atlas')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">05</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#0f172a]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#0f172a"/>
+            <ellipse cx="200" cy="112" rx="140" ry="90" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+            <ellipse cx="200" cy="112" rx="100" ry="90" fill="none" stroke="#1e3a5f" stroke-width=".5"/>
+            <ellipse cx="200" cy="112" rx="60" ry="90" fill="none" stroke="#1e3a5f" stroke-width=".5"/>
+            <line x1="60" y1="112" x2="340" y2="112" stroke="#1e3a5f" stroke-width=".5"/>
+            <line x1="200" y1="22" x2="200" y2="202" stroke="#1e3a5f" stroke-width=".5"/>
+            <circle cx="110" cy="88" r="5" fill="#3700b2" opacity=".8"/>
+            <circle cx="168" cy="72" r="4" fill="#3700b2" opacity=".6"/>
+            <circle cx="255" cy="95" r="5" fill="#1960a3" opacity=".8"/>
+            <circle cx="290" cy="130" r="4" fill="#1960a3" opacity=".6"/>
+            <circle cx="145" cy="148" r="4" fill="#3700b2" opacity=".6"/>
+            <circle cx="220" cy="155" r="5" fill="#1960a3" opacity=".8"/>
+            <line x1="110" y1="88" x2="255" y2="95" stroke="#3700b2" stroke-width="1" stroke-dasharray="4,2" opacity=".6"/>
+            <line x1="168" y1="72" x2="290" y2="130" stroke="#1960a3" stroke-width="1" stroke-dasharray="4,2" opacity=".6"/>
+            <line x1="145" y1="148" x2="220" y2="155" stroke="#3700b2" stroke-width="1" stroke-dasharray="4,2" opacity=".6"/>
+            <rect x="8" y="8" width="90" height="60" fill="#0d1b2a" stroke="#1e3a5f" stroke-width=".5"/>
+            <text x="14" y="22" fill="#60a5fa" font-size="6" font-family="monospace">ATLAS GLOBAL</text>
+            <text x="14" y="36" fill="#9ca3af" font-size="5" font-family="monospace">ACTIVE ROUTES</text>
+            <text x="14" y="48" fill="#ffffff" font-size="14" font-family="monospace" font-weight="bold">124</text>
+            <text x="14" y="60" fill="#4ade80" font-size="5" font-family="monospace">▲ 8 new today</text>
+            <rect x="302" y="8" width="90" height="60" fill="#0d1b2a" stroke="#1e3a5f" stroke-width=".5"/>
+            <text x="308" y="22" fill="#60a5fa" font-size="6" font-family="monospace">DELIVERY</text>
+            <text x="308" y="36" fill="#9ca3af" font-size="5" font-family="monospace">ON TIME RATE</text>
+            <text x="308" y="48" fill="#4ade80" font-size="14" font-family="monospace" font-weight="bold">97.2%</text>
+            <rect x="8" y="165" width="384" height="52" fill="#0d1b2a" stroke="#1e3a5f" stroke-width=".5"/>
+            <text x="14" y="178" fill="#60a5fa" font-size="6" font-family="monospace">LIVE SHIPMENTS</text>
+            <rect x="14" y="184" width="6" height="6" rx="1" fill="#4ade80"/>
+            <text x="24" y="190" fill="#9ca3af" font-size="5" font-family="monospace">SHP-0091 · Amsterdam → NYC · ETA 14h</text>
+            <rect x="14" y="196" width="6" height="6" rx="1" fill="#facc15"/>
+            <text x="24" y="202" fill="#9ca3af" font-size="5" font-family="monospace">SHP-0087 · London → Dubai · CUSTOMS HOLD</text>
+            <rect x="200" y="184" width="6" height="6" rx="1" fill="#4ade80"/>
+            <text x="210" y="190" fill="#9ca3af" font-size="5" font-family="monospace">SHP-0094 · Berlin → Tokyo · ETA 2d</text>
+            <rect x="200" y="196" width="6" height="6" rx="1" fill="#4ade80"/>
+            <text x="210" y="202" fill="#9ca3af" font-size="5" font-family="monospace">SHP-0099 · Paris → Sydney · ON TRACK</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Atlas Global</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">Logistics / Geo-Fencing</p>
+      </div>
+
+      <!-- 06 Nexus Learn — EdTech -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('nexus')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">06</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#f9fafb]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#f9fafb"/>
+            <rect x="0" y="0" width="400" height="40" fill="#ffffff" stroke="#e5e7eb" stroke-width=".5"/>
+            <rect x="10" y="12" width="50" height="16" rx="2" fill="#1960a3"/>
+            <text x="18" y="23" fill="#fff" font-size="7" font-family="monospace" font-weight="bold">NEXUS</text>
+            <text x="75" y="23" fill="#374151" font-size="7" font-family="monospace">Courses</text>
+            <text x="120" y="23" fill="#374151" font-size="7" font-family="monospace">My Learning</text>
+            <text x="180" y="23" fill="#374151" font-size="7" font-family="monospace">Live Classes</text>
+            <rect x="330" y="12" width="60" height="16" rx="2" fill="#1960a3"/>
+            <text x="342" y="23" fill="#fff" font-size="7" font-family="monospace">Enroll</text>
+            <rect x="10" y="50" width="180" height="90" rx="2" fill="#ffffff" stroke="#e5e7eb" stroke-width=".5"/>
+            <rect x="10" y="50" width="180" height="40" fill="#dbeafe"/>
+            <text x="20" y="72" fill="#1e40af" font-size="10" font-family="monospace" font-weight="bold">React Mastery</text>
+            <text x="20" y="100" fill="#374151" font-size="6" font-family="monospace">Instructor: A. Williams</text>
+            <text x="20" y="112" fill="#374151" font-size="6" font-family="monospace">4.9 ★ · 12,400 students</text>
+            <rect x="20" y="122" width="90" height="10" rx="1" fill="#e5e7eb"/>
+            <rect x="20" y="122" width="72" height="10" rx="1" fill="#1960a3"/>
+            <text x="115" y="131" fill="#6b7280" font-size="6" font-family="monospace">80%</text>
+            <rect x="200" y="50" width="190" height="100" rx="2" fill="#0f172a"/>
+            <text x="210" y="68" fill="#60a5fa" font-size="7" font-family="monospace">▶ LIVE NOW · React Hooks</text>
+            <rect x="210" y="75" width="170" height="50" rx="1" fill="#1e293b"/>
+            <text x="285" y="105" fill="#4ade80" font-size="20" font-family="monospace">▶</text>
+            <text x="210" y="138" fill="#9ca3af" font-size="5" font-family="monospace">👁 2,847 watching · Q&amp;A open</text>
+            <rect x="10" y="150" width="380" height="60" fill="#ffffff" stroke="#e5e7eb" stroke-width=".5"/>
+            <text x="20" y="165" fill="#111" font-size="7" font-family="monospace" font-weight="bold">MY PROGRESS</text>
+            <text x="20" y="180" fill="#6b7280" font-size="6" font-family="monospace">React Mastery</text>
+            <rect x="20" y="185" width="100" height="6" rx="1" fill="#e5e7eb"/>
+            <rect x="20" y="185" width="80" height="6" rx="1" fill="#1960a3"/>
+            <text x="125" y="191" fill="#1960a3" font-size="6" font-family="monospace">80%</text>
+            <text x="180" y="180" fill="#6b7280" font-size="6" font-family="monospace">Node.js Pro</text>
+            <rect x="180" y="185" width="100" height="6" rx="1" fill="#e5e7eb"/>
+            <rect x="180" y="185" width="45" height="6" rx="1" fill="#7c3aed"/>
+            <text x="285" y="191" fill="#7c3aed" font-size="6" font-family="monospace">45%</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Nexus Learn</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">EdTech / LMS Platform</p>
+      </div>
+
+      <!-- 07 MediCore — HealthTech -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('medicore')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">07</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#f0fdf4]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#f0fdf4"/>
+            <rect x="0" y="0" width="90" height="225" fill="#ffffff" stroke="#d1fae5" stroke-width=".5"/>
+            <rect x="8" y="12" width="74" height="18" rx="2" fill="#059669"/>
+            <text x="24" y="24" fill="#fff" font-size="8" font-family="monospace" font-weight="bold">MEDI+</text>
+            <text x="14" y="50" fill="#6b7280" font-size="6" font-family="monospace">Dashboard</text>
+            <text x="14" y="65" fill="#059669" font-size="6" font-family="monospace" font-weight="bold">▸ Patients</text>
+            <text x="14" y="80" fill="#6b7280" font-size="6" font-family="monospace">Appointments</text>
+            <text x="14" y="95" fill="#6b7280" font-size="6" font-family="monospace">Records</text>
+            <text x="14" y="110" fill="#6b7280" font-size="6" font-family="monospace">Prescriptions</text>
+            <text x="14" y="125" fill="#6b7280" font-size="6" font-family="monospace">Lab Results</text>
+            <rect x="100" y="10" width="290" height="205" fill="#ffffff" stroke="#d1fae5" stroke-width=".5"/>
+            <text x="110" y="28" fill="#111" font-size="9" font-family="monospace" font-weight="bold">Patient Overview</text>
+            <rect x="110" y="35" width="130" height="55" rx="1" fill="#f0fdf4" stroke="#d1fae5" stroke-width=".5"/>
+            <text x="118" y="50" fill="#059669" font-size="7" font-family="monospace" font-weight="bold">Sarah Johnson</text>
+            <text x="118" y="62" fill="#6b7280" font-size="6" font-family="monospace">DOB: 1985-03-14 · F</text>
+            <text x="118" y="74" fill="#6b7280" font-size="6" font-family="monospace">Blood: A+ · Allergies: 2</text>
+            <text x="118" y="84" fill="#059669" font-size="6" font-family="monospace">✓ Active Patient</text>
+            <rect x="250" y="35" width="130" height="55" rx="1" fill="#ffffff" stroke="#d1fae5" stroke-width=".5"/>
+            <text x="258" y="50" fill="#374151" font-size="7" font-family="monospace">Vitals · Today</text>
+            <text x="258" y="63" fill="#111" font-size="7" font-family="monospace">BP: <tspan fill="#059669">120/80</tspan></text>
+            <text x="258" y="75" fill="#111" font-size="7" font-family="monospace">HR: <tspan fill="#059669">72 bpm</tspan></text>
+            <text x="258" y="87" fill="#111" font-size="7" font-family="monospace">O2: <tspan fill="#059669">98%</tspan></text>
+            <text x="110" y="110" fill="#374151" font-size="7" font-family="monospace" font-weight="bold">Heart Rate — 24h</text>
+            <polyline points="110,155 130,148 150,152 170,142 190,146 210,136 230,140 250,132 270,136 290,128 310,132 330,124 350,128 370,122 385,126" fill="none" stroke="#059669" stroke-width="1.5"/>
+            <polyline points="110,155 130,148 150,152 170,142 190,146 210,136 230,140 250,132 270,136 290,128 310,132 330,124 350,128 370,122 385,126 385,165 110,165" fill="#059669" opacity=".08"/>
+            <rect x="110" y="172" width="130" height="30" rx="1" fill="#f0fdf4" stroke="#d1fae5" stroke-width=".5"/>
+            <text x="118" y="184" fill="#059669" font-size="6" font-family="monospace">NEXT APPOINTMENT</text>
+            <text x="118" y="196" fill="#111" font-size="6" font-family="monospace">Apr 15 · 14:00 · Dr. Chen</text>
+            <rect x="250" y="172" width="130" height="30" rx="1" fill="#059669"/>
+            <text x="258" y="184" fill="#d1fae5" font-size="6" font-family="monospace">PRESCRIPTION</text>
+            <text x="258" y="196" fill="#ffffff" font-size="6" font-family="monospace">2 active · 1 renewal due</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">MediCore</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">HealthTech / Patient Portal</p>
+      </div>
+
+      <!-- 08 Vendo Prime — Multi-vendor -->
+      <div class="project-card border-r border-b p-8 group cursor-pointer" onclick="openProject('vendo')">
+        <div class="mb-6 flex justify-between items-start">
+          <span class="card-num font-mono text-5xl text-outline-variant/30 transition-colors">08</span>
+          <span class="card-arrow material-symbols-outlined text-primary transition-colors">north_east</span>
+        </div>
+        <div class="mb-6 aspect-video overflow-hidden bg-[#18181b]">
+          <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+            <rect width="400" height="225" fill="#18181b"/>
+            <rect x="0" y="0" width="400" height="32" fill="#111111"/>
+            <rect x="10" y="8" width="55" height="16" rx="1" fill="#f59e0b"/>
+            <text x="16" y="19" fill="#000" font-size="8" font-family="monospace" font-weight="bold">VENDO</text>
+            <text x="80" y="20" fill="#9ca3af" font-size="7" font-family="monospace">Marketplace</text>
+            <text x="155" y="20" fill="#9ca3af" font-size="7" font-family="monospace">Vendors</text>
+            <text x="210" y="20" fill="#9ca3af" font-size="7" font-family="monospace">Analytics</text>
+            <rect x="330" y="8" width="60" height="16" rx="1" fill="#f59e0b"/>
+            <text x="342" y="19" fill="#000" font-size="7" font-family="monospace" font-weight="bold">+ List</text>
+            <rect x="10" y="42" width="85" height="90" rx="1" fill="#27272a" stroke="#3f3f46" stroke-width=".5"/>
+            <rect x="10" y="42" width="85" height="45" fill="#f59e0b" opacity=".15"/>
+            <text x="42" y="68" fill="#f59e0b" font-size="18" font-family="monospace">⌚</text>
+            <text x="18" y="100" fill="#ffffff" font-size="7" font-family="monospace" font-weight="bold">Apex Watch</text>
+            <text x="18" y="112" fill="#f59e0b" font-size="8" font-family="monospace">$299</text>
+            <rect x="18" y="118" width="69" height="10" rx="1" fill="#f59e0b"/>
+            <text x="30" y="126" fill="#000" font-size="5" font-family="monospace" font-weight="bold">Add to Cart</text>
+            <rect x="105" y="42" width="85" height="90" rx="1" fill="#27272a" stroke="#f59e0b" stroke-width="1"/>
+            <rect x="105" y="42" width="85" height="45" fill="#7c3aed" opacity=".2"/>
+            <text x="137" y="68" fill="#a78bfa" font-size="18" font-family="monospace">🎧</text>
+            <rect x="105" y="42" width="30" height="12" rx="1" fill="#f59e0b"/>
+            <text x="109" y="51" fill="#000" font-size="5" font-family="monospace" font-weight="bold">FEATURED</text>
+            <text x="113" y="100" fill="#ffffff" font-size="7" font-family="monospace" font-weight="bold">Pro Buds X</text>
+            <text x="113" y="112" fill="#f59e0b" font-size="8" font-family="monospace">$179</text>
+            <rect x="113" y="118" width="69" height="10" rx="1" fill="#f59e0b"/>
+            <text x="125" y="126" fill="#000" font-size="5" font-family="monospace" font-weight="bold">Add to Cart</text>
+            <rect x="200" y="42" width="85" height="90" rx="1" fill="#27272a" stroke="#3f3f46" stroke-width=".5"/>
+            <rect x="200" y="42" width="85" height="45" fill="#059669" opacity=".15"/>
+            <text x="232" y="68" fill="#34d399" font-size="18" font-family="monospace">👟</text>
+            <text x="208" y="100" fill="#ffffff" font-size="7" font-family="monospace" font-weight="bold">Run Elite</text>
+            <text x="208" y="112" fill="#f59e0b" font-size="8" font-family="monospace">$149</text>
+            <rect x="208" y="118" width="69" height="10" rx="1" fill="#f59e0b"/>
+            <text x="220" y="126" fill="#000" font-size="5" font-family="monospace" font-weight="bold">Add to Cart</text>
+            <rect x="295" y="42" width="100" height="90" rx="1" fill="#111111" stroke="#3f3f46" stroke-width=".5"/>
+            <text x="303" y="57" fill="#f59e0b" font-size="6" font-family="monospace" font-weight="bold">VENDOR STATS</text>
+            <text x="303" y="72" fill="#9ca3af" font-size="5" font-family="monospace">Revenue Today</text>
+            <text x="303" y="84" fill="#ffffff" font-size="12" font-family="monospace" font-weight="bold">$12.4k</text>
+            <text x="303" y="96" fill="#4ade80" font-size="5" font-family="monospace">▲ +18% vs yesterday</text>
+            <text x="303" y="110" fill="#9ca3af" font-size="5" font-family="monospace">Orders: 87 · Pending: 12</text>
+            <rect x="303" y="115" width="80" height="10" rx="1" fill="#27272a"/>
+            <rect x="303" y="115" width="65" height="10" rx="1" fill="#f59e0b" opacity=".7"/>
+            <rect x="10" y="142" width="385" height="72" rx="1" fill="#111111" stroke="#3f3f46" stroke-width=".5"/>
+            <text x="18" y="157" fill="#f59e0b" font-size="7" font-family="monospace" font-weight="bold">LIVE ORDERS</text>
+            <text x="18" y="172" fill="#9ca3af" font-size="5" font-family="monospace">#5821 · Apex Watch · $299 · Processing</text>
+            <rect x="340" y="164" width="45" height="10" rx="1" fill="#f59e0b" opacity=".3"/>
+            <text x="348" y="172" fill="#f59e0b" font-size="5" font-family="monospace">PROCESS</text>
+            <text x="18" y="187" fill="#9ca3af" font-size="5" font-family="monospace">#5820 · Pro Buds X · $179 · Shipped ✓</text>
+            <text x="18" y="202" fill="#9ca3af" font-size="5" font-family="monospace">#5819 · Run Elite × 2 · $298 · Delivered ✓</text>
+          </svg>
+        </div>
+        <h3 class="font-bold text-xl uppercase mb-1 transition-colors">Vendo Prime</h3>
+        <p class="card-tag font-mono text-xs uppercase text-on-surface-variant transition-colors">E-Commerce / Multi-vendor</p>
+      </div>
+
+    </div>
+
+    <div class="mt-12 flex justify-center">
+      <button class="shimmer bg-surface-container-lowest border border-outline-variant px-12 py-6 font-label uppercase tracking-[.4em] text-sm flex items-center gap-4 hover:bg-primary hover:text-white hover:border-primary transition-all" data-key="view_all">
+        View All 20 Projects
+        <span class="font-black text-lg">→</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     METHODOLOGY
+════════════════════════════════════════════════════ -->
+<section id="methodology" class="py-32 px-6 lg:px-24 bg-surface-container-low">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+      <div class="lg:sticky lg:top-32">
+        <span class="sec-label block mb-6" data-key="meth_label">How We Work</span>
+        <h2 class="font-black text-5xl md:text-7xl uppercase leading-[.9] mb-12" data-key="meth_title">The<br/><span class="text-primary">Engineering</span><br/>Standard</h2>
+
+        <div class="space-y-8">
+          <div class="flex gap-6 items-start">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center text-primary font-black shrink-0">01</div>
+            <div>
+              <h4 class="font-bold uppercase mb-2" data-key="meth_1_title">Atomic Precision</h4>
+              <p class="text-on-surface-variant text-sm leading-relaxed" data-key="meth_1_desc">Every pixel verified. 4px grid system. Perfect alignment across all viewports and devices.</p>
+            </div>
+          </div>
+          <div class="flex gap-6 items-start">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center text-primary font-black shrink-0">02</div>
+            <div>
+              <h4 class="font-bold uppercase mb-2" data-key="meth_2_title">Monolithic Stack</h4>
+              <p class="text-on-surface-variant text-sm leading-relaxed" data-key="meth_2_desc">Modern tech on legacy-grade stability. Performance and long-term maintainability first.</p>
+            </div>
+          </div>
+          <div class="flex gap-6 items-start">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center text-primary font-black shrink-0">03</div>
+            <div>
+              <h4 class="font-bold uppercase mb-2" data-key="meth_3_title">Iterative Delivery</h4>
+              <p class="text-on-surface-variant text-sm leading-relaxed" data-key="meth_3_desc">Milestone-based delivery with client approval at every stage. Transparent progress, no surprises.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <div class="bg-surface-container-lowest p-12 border border-outline-variant group hover:border-primary transition-colors">
+          <span class="sec-label block mb-4" data-key="proc_1_label">Phase 01 — Discovery</span>
+          <h3 class="font-black text-3xl uppercase mb-4" data-key="proc_1_title">Structural Audit</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="proc_1_desc">Deep architectural audit of your business needs, competition landscape, and technical requirements. Bottlenecks identified before they exist.</p>
+          <div class="flex items-center gap-3 text-primary font-mono text-xs uppercase tracking-widest">
+            <span>Week 1</span><div class="h-px flex-1 bg-outline-variant"></div>
+            <span data-key="proc_duration_1">2–3 days</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-high p-12 border border-outline-variant group hover:border-primary transition-colors">
+          <span class="sec-label block mb-4" data-key="proc_2_label">Phase 02 — Design</span>
+          <h3 class="font-black text-3xl uppercase mb-4" data-key="proc_2_title">Blueprint Construction</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="proc_2_desc">High-fidelity wireframes and design systems built collaboratively. You approve before a single line of code is written.</p>
+          <div class="flex items-center gap-3 text-primary font-mono text-xs uppercase tracking-widest">
+            <span>Week 2</span><div class="h-px flex-1 bg-outline-variant"></div>
+            <span data-key="proc_duration_2">3–5 days</span>
+          </div>
+        </div>
+        <div class="bg-primary p-12 text-white group">
+          <span class="font-mono text-xs uppercase tracking-widest text-on-primary-container block mb-4" data-key="proc_3_label">Phase 03 — Engineering</span>
+          <h3 class="font-black text-3xl uppercase mb-4" data-key="proc_3_title">Core Construction</h3>
+          <p class="text-on-primary-container text-sm leading-relaxed mb-6" data-key="proc_3_desc">Industrial-strength code. Iterative builds with weekly demos. Testing at every layer.</p>
+          <div class="flex items-center gap-3 text-on-primary-container font-mono text-xs uppercase tracking-widest">
+            <span>Weeks 3–6</span><div class="h-px flex-1 bg-white/20"></div>
+            <span data-key="proc_duration_3">Variable</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-12 border border-outline-variant group hover:border-primary transition-colors">
+          <span class="sec-label block mb-4" data-key="proc_4_label">Phase 04 — Launch</span>
+          <h3 class="font-black text-3xl uppercase mb-4" data-key="proc_4_title">Deployment & Handoff</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="proc_4_desc">Zero-downtime deployment. Full training included. 30 days post-launch support guaranteed.</p>
+          <div class="flex items-center gap-3 text-primary font-mono text-xs uppercase tracking-widest">
+            <span>Final</span><div class="h-px flex-1 bg-outline-variant"></div>
+            <span data-key="proc_duration_4">1–2 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PRICING
+════════════════════════════════════════════════════ -->
+<section id="pricing" class="py-32 px-6 lg:px-24 bg-surface">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="text-center mb-20">
+      <span class="sec-label block mb-4" data-key="price_label">Transparent Pricing</span>
+      <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter mb-6" data-key="price_title">Rate Card</h2>
+      <p class="text-on-surface-variant max-w-lg mx-auto text-sm leading-relaxed" data-key="price_sub">No hidden fees. No surprise invoices. Every project starts with a fixed-scope agreement.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div class="price-card p-10 border border-outline-variant">
+        <div class="mb-8">
+          <span class="sec-label block mb-3" data-key="plan_starter_label">Starter</span>
+          <div class="flex items-end gap-2 mb-2">
+            <span class="font-black text-5xl tracking-tighter">€500</span>
+            <span class="text-on-surface-variant text-sm mb-2" data-key="plan_from">starting from</span>
+          </div>
+          <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest" data-key="plan_starter_type">Landing Page / Portfolio</p>
+        </div>
+        <div class="space-y-3 mb-10">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-sm">check</span>
+            <span class="text-sm price-feature" data-key="feat_custom_design">Custom design</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-sm">check</span>
+            <span class="text-sm price-feature" data-key="feat_responsive">100% Responsive</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-sm">check</span>
+            <span class="text-sm price-feature" data-key="feat_seo">SEO Optimized</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-sm">check</span>
+            <span class="text-sm price-feature" data-key="feat_perf">Sub-1s Performance</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-sm">check</span>
+            <span class="text-sm price-feature" data-key="feat_support30">30-day Support</span>
+          </div>
+        </div>
+        <a href="#contact" class="shimmer w-full block text-center py-4 border border-primary text-primary font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all" data-key="plan_cta">Get Started</a>
+      </div>
+
+      <div class="price-card featured p-10 relative">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-primary font-label text-xs uppercase tracking-widest px-4 py-1 border border-primary" data-key="plan_popular">Most Popular</div>
+        <div class="mb-8">
+          <span class="font-mono text-xs uppercase tracking-widest block mb-3 text-on-primary-container" data-key="plan_pro_label">Professional</span>
+          <div class="flex items-end gap-2 mb-2">
+            <span class="font-black text-5xl tracking-tighter text-white">€2.500</span>
+            <span class="text-on-primary-container text-sm mb-2" data-key="plan_from">starting from</span>
+          </div>
+          <p class="text-on-primary-container text-xs font-mono uppercase tracking-widest" data-key="plan_pro_type">E-Commerce / Corporate</p>
+        </div>
+        <div class="space-y-3 mb-10">
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_everything">Everything in Starter</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_cms">CMS Integration</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_multilang">Multilingual Support</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_analytics">Analytics Dashboard</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_support90">90-day Support</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-primary-container text-sm">check</span><span class="text-sm price-feature" data-key="feat_training">Team Training</span></div>
+        </div>
+        <a href="#contact" class="shimmer w-full block text-center py-4 bg-white text-primary font-label text-xs uppercase tracking-widest hover:bg-primary-fixed transition-all font-bold" data-key="plan_cta">Get Started</a>
+      </div>
+
+      <div class="price-card p-10 border border-outline-variant">
+        <div class="mb-8">
+          <span class="sec-label block mb-3" data-key="plan_enterprise_label">Enterprise</span>
+          <div class="flex items-end gap-2 mb-2">
+            <span class="font-black text-5xl tracking-tighter">€8.000</span>
+            <span class="text-on-surface-variant text-sm mb-2" data-key="plan_from">starting from</span>
+          </div>
+          <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest" data-key="plan_enterprise_type">SaaS / Full-Stack App</p>
+        </div>
+        <div class="space-y-3 mb-10">
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_everything_pro">Everything in Pro</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_auth">Auth & User Management</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_api">API Architecture</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_billing">Billing Integration</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_support180">180-day Support</span></div>
+          <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-sm">check</span><span class="text-sm price-feature" data-key="feat_sla">SLA Guarantee</span></div>
+        </div>
+        <a href="#contact" class="shimmer w-full block text-center py-4 border border-primary text-primary font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all" data-key="plan_cta">Get Started</a>
+      </div>
+    </div>
+
+    <p class="text-center font-mono text-xs text-on-surface-variant mt-8 uppercase tracking-widest" data-key="price_note">All prices are estimates. Final quote provided after discovery call.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════════════════ -->
+<section id="testimonials" class="py-32 px-6 lg:px-24 bg-surface-container-low overflow-hidden">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+      <div>
+        <span class="sec-label block mb-4" data-key="test_label">Client Feedback</span>
+        <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter" data-key="test_title">What They<br/>Say</h2>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="prevTestimonial()" class="w-12 h-12 border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <button onclick="nextTestimonial()" class="w-12 h-12 border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-hidden">
+      <div class="testimonial-track" id="testimonialTrack">
+        <!-- Testimonial 1 -->
+        <div class="min-w-full md:min-w-[50%] lg:min-w-[33.333%] pr-6">
+          <div class="bg-surface-container-lowest border border-outline-variant p-10 h-full">
+            <div class="flex gap-1 mb-6">
+              <span class="text-amber-400 text-lg">★★★★★</span>
+            </div>
+            <blockquote class="text-lg font-light leading-relaxed mb-8 text-on-surface" data-key="test1_quote">"We received the site in 3 weeks. It looks incredible and loads in under a second. We've already acquired clients through it."</blockquote>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-primary flex items-center justify-center text-white font-black text-lg">M</div>
+              <div>
+                <div class="font-bold uppercase text-sm">Mihai R.</div>
+                <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest" data-key="test1_role">Owner, Real Estate Agency</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="min-w-full md:min-w-[50%] lg:min-w-[33.333%] pr-6">
+          <div class="bg-primary p-10 h-full text-white">
+            <div class="flex gap-1 mb-6">
+              <span class="text-amber-300 text-lg">★★★★★</span>
+            </div>
+            <blockquote class="text-lg font-light leading-relaxed mb-8 text-on-primary-container" data-key="test2_quote">"The e-commerce platform they built handles 10x our previous traffic without breaking a sweat. Best investment we've made."</blockquote>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white flex items-center justify-center text-primary font-black text-lg">A</div>
+              <div>
+                <div class="font-bold uppercase text-sm text-white">Alexandra P.</div>
+                <div class="font-mono text-xs text-on-primary-container uppercase tracking-widest" data-key="test2_role">CEO, Fashion Brand</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonial 3 -->
+        <div class="min-w-full md:min-w-[50%] lg:min-w-[33.333%] pr-6">
+          <div class="bg-surface-container-lowest border border-outline-variant p-10 h-full">
+            <div class="flex gap-1 mb-6">
+              <span class="text-amber-400 text-lg">★★★★★</span>
+            </div>
+            <blockquote class="text-lg font-light leading-relaxed mb-8 text-on-surface" data-key="test3_quote">"Professional, fast, and the result is stunning. Our SaaS dashboard reduced churn by 40% since the redesign."</blockquote>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-secondary flex items-center justify-center text-white font-black text-lg">R</div>
+              <div>
+                <div class="font-bold uppercase text-sm">Robert K.</div>
+                <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest" data-key="test3_role">CTO, SaaS Startup</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonial 4 -->
+        <div class="min-w-full md:min-w-[50%] lg:min-w-[33.333%] pr-6">
+          <div class="bg-surface-container-lowest border border-outline-variant p-10 h-full">
+            <div class="flex gap-1 mb-6">
+              <span class="text-amber-400 text-lg">★★★★★</span>
+            </div>
+            <blockquote class="text-lg font-light leading-relaxed mb-8 text-on-surface" data-key="test4_quote">"Delivered on time, on budget, and exceeds every specification. The attention to detail is extraordinary."</blockquote>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-tertiary flex items-center justify-center text-white font-black text-lg">L</div>
+              <div>
+                <div class="font-bold uppercase text-sm">Laura M.</div>
+                <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest" data-key="test4_role">Director, Marketing Agency</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Dots -->
+    <div class="flex justify-center gap-2 mt-8" id="testimonialDots"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     BLOG
+════════════════════════════════════════════════════ -->
+<section id="blog" class="py-32 px-6 lg:px-24 bg-surface">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+      <div>
+        <span class="sec-label block mb-4" data-key="blog_label">Resources & Insights</span>
+        <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter" data-key="blog_title">The<br/>Codebase</h2>
+      </div>
+      <a href="#" class="font-label text-xs uppercase tracking-widest text-primary flex items-center gap-2 hover:gap-4 transition-all" data-key="blog_all">View All Articles <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <article class="border border-outline-variant group hover:border-primary transition-colors cursor-pointer">
+        <div class="aspect-video bg-surface-container overflow-hidden relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary-container/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+            <span class="material-symbols-outlined text-primary text-4xl">speed</span>
+          </div>
+        </div>
+        <div class="p-8">
+          <span class="sec-label block mb-3" data-key="blog1_cat">Performance</span>
+          <h3 class="font-bold text-xl uppercase mb-3 group-hover:text-primary transition-colors" data-key="blog1_title">Achieving Sub-1s Load Times in 2025</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="blog1_desc">A deep dive into modern performance techniques: code splitting, edge deployment, and image optimization strategies.</p>
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs text-on-surface-variant" data-key="blog1_date">Mar 15, 2025</span>
+            <span class="font-mono text-xs text-primary uppercase tracking-widest flex items-center gap-1" data-key="read_more">Read <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+          </div>
+        </div>
+      </article>
+
+      <article class="border border-outline-variant group hover:border-primary transition-colors cursor-pointer">
+        <div class="aspect-video bg-surface-container overflow-hidden relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary-container/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+            <span class="material-symbols-outlined text-secondary text-4xl">security</span>
+          </div>
+        </div>
+        <div class="p-8">
+          <span class="sec-label block mb-3" data-key="blog2_cat">Security</span>
+          <h3 class="font-bold text-xl uppercase mb-3 group-hover:text-primary transition-colors" data-key="blog2_title">GDPR-Compliant Architecture for Modern Apps</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="blog2_desc">How we design data flows and storage systems that are compliant by default, not as an afterthought.</p>
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs text-on-surface-variant" data-key="blog2_date">Feb 28, 2025</span>
+            <span class="font-mono text-xs text-primary uppercase tracking-widest flex items-center gap-1" data-key="read_more">Read <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+          </div>
+        </div>
+      </article>
+
+      <article class="border border-outline-variant group hover:border-primary transition-colors cursor-pointer">
+        <div class="aspect-video bg-surface-container overflow-hidden relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-tertiary/20 to-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+            <span class="material-symbols-outlined text-tertiary text-4xl">conversion_path</span>
+          </div>
+        </div>
+        <div class="p-8">
+          <span class="sec-label block mb-3" data-key="blog3_cat">Conversion</span>
+          <h3 class="font-bold text-xl uppercase mb-3 group-hover:text-primary transition-colors" data-key="blog3_title">Why Custom Code Beats Templates Every Time</h3>
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-6" data-key="blog3_desc">The real cost of page builders and why bespoke architecture consistently outperforms in conversions.</p>
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs text-on-surface-variant" data-key="blog3_date">Feb 10, 2025</span>
+            <span class="font-mono text-xs text-primary uppercase tracking-widest flex items-center gap-1" data-key="read_more">Read <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════════════ -->
+<section id="faq" class="py-32 px-6 lg:px-24 bg-surface-container-low">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-20">
+      <span class="sec-label block mb-4" data-key="faq_label">Got Questions?</span>
+      <h2 class="font-black text-5xl md:text-7xl uppercase tracking-tighter" data-key="faq_title">FAQ</h2>
+    </div>
+
+    <div class="space-y-0" id="faqContainer">
+
+      <div class="faq-item border-b border-outline-variant">
+        <button class="w-full flex justify-between items-center py-7 text-left" onclick="toggleFaq(this)">
+          <span class="font-bold uppercase text-lg pr-8" data-key="faq1_q">How long does a project take?</span>
+          <span class="faq-toggle material-symbols-outlined text-primary flex-shrink-0">add</span>
+        </button>
+        <div class="faq-content">
+          <p class="text-on-surface-variant text-sm leading-relaxed pb-7" data-key="faq1_a">A landing page takes 2–3 weeks. A full e-commerce site or corporate platform takes 4–8 weeks. We provide realistic timelines upfront and stick to them.</p>
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-outline-variant">
+        <button class="w-full flex justify-between items-center py-7 text-left" onclick="toggleFaq(this)">
+          <span class="font-bold uppercase text-lg pr-8" data-key="faq2_q">Why not use WordPress or Shopify?</span>
+          <span class="faq-toggle material-symbols-outlined text-primary flex-shrink-0">add</span>
+        </button>
+        <div class="faq-content">
+          <p class="text-on-surface-variant text-sm leading-relaxed pb-7" data-key="faq2_a">Templates limit you. Custom code means superior performance (sub-1s load), better security, unique design, and unlimited scalability. Your site shouldn't look like your competitor's.</p>
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-outline-variant">
+        <button class="w-full flex justify-between items-center py-7 text-left" onclick="toggleFaq(this)">
+          <span class="font-bold uppercase text-lg pr-8" data-key="faq3_q">What happens after launch?</span>
+          <span class="faq-toggle material-symbols-outlined text-primary flex-shrink-0">add</span>
+        </button>
+        <div class="faq-content">
+          <p class="text-on-surface-variant text-sm leading-relaxed pb-7" data-key="faq3_a">Full training on your CMS, 30–180 days post-launch support depending on plan, and optional monthly maintenance packages. You're never left alone.</p>
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-outline-variant">
+        <button class="w-full flex justify-between items-center py-7 text-left" onclick="toggleFaq(this)">
+          <span class="font-bold uppercase text-lg pr-8" data-key="faq4_q">Do you work with international clients?</span>
+          <span class="faq-toggle material-symbols-outlined text-primary flex-shrink-0">add</span>
+        </button>
+        <div class="faq-content">
+          <p class="text-on-surface-variant text-sm leading-relaxed pb-7" data-key="faq4_a">Yes. We work with clients across Europe and beyond. Communication in English, Romanian, French, and German. Time zone flexible.</p>
+        </div>
+      </div>
+
+      <div class="faq-item border-b border-outline-variant">
+        <button class="w-full flex justify-between items-center py-7 text-left" onclick="toggleFaq(this)">
+          <span class="font-bold uppercase text-lg pr-8" data-key="faq5_q">How do payments work?</span>
+          <span class="faq-toggle material-symbols-outlined text-primary flex-shrink-0">add</span>
+        </button>
+        <div class="faq-content">
+          <p class="text-on-surface-variant text-sm leading-relaxed pb-7" data-key="faq5_a">50% upfront to begin, 50% on delivery. For larger projects, milestone-based payments are available. All major payment methods accepted.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════════════════ -->
+<section class="bg-primary py-32 px-6 lg:px-24 text-white overflow-hidden relative">
+  <div class="absolute inset-0 arch-grid opacity-10"></div>
+  <div class="max-w-[1440px] mx-auto text-center relative z-10">
+    <h2 class="font-black uppercase tracking-tighter mb-8 leading-[.9]" style="font-size:clamp(2.5rem,7vw,7rem)" data-key="cta_title">Ready to Build?</h2>
+    <p class="text-xl text-on-primary-container max-w-2xl mx-auto mb-16 leading-relaxed" data-key="cta_sub">Join brands that prioritize precision over trends. Let's architect your digital legacy together.</p>
+    <div class="flex flex-wrap justify-center gap-6">
+      <a href="#contact" class="shimmer px-16 py-6 bg-white text-primary font-label uppercase tracking-widest text-sm font-bold hover:bg-primary-fixed transition-colors" data-key="cta_btn1">Start Project Brief</a>
+      <a href="#pricing" class="shimmer px-16 py-6 border-2 border-white/30 text-white font-label uppercase tracking-widest text-sm hover:bg-white/10 transition-colors" data-key="cta_btn2">View Rate Card</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CONTACT
+════════════════════════════════════════════════════ -->
+<section id="contact" class="py-32 px-6 lg:px-24 bg-surface">
+  <div class="max-w-[1440px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-20">
+      <div class="lg:col-span-2">
+        <span class="sec-label block mb-6" data-key="contact_label">Get In Touch</span>
+        <h2 class="font-black text-5xl uppercase tracking-tighter leading-[.9] mb-8" data-key="contact_title">Start Your<br/>Project.</h2>
+        <p class="text-on-surface-variant leading-relaxed mb-10 text-sm" data-key="contact_sub">Fill in the form and receive a detailed estimate within 24 hours. No obligation, no spam.</p>
+
+        <div class="space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">schedule</span>
+            </div>
+            <div>
+              <div class="font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-1" data-key="contact_resp_label">Response Time</div>
+              <div class="font-bold uppercase" data-key="contact_resp">Under 24 Hours</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">lock</span>
+            </div>
+            <div>
+              <div class="font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-1" data-key="contact_priv_label">Privacy</div>
+              <div class="font-bold uppercase" data-key="contact_priv">100% Confidential</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">payments</span>
+            </div>
+            <div>
+              <div class="font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-1" data-key="contact_est_label">Estimate</div>
+              <div class="font-bold uppercase" data-key="contact_est">Always Free</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-3">
+        <div class="bg-surface-container-lowest border border-outline-variant p-10">
+          <form id="mainContactForm" class="space-y-6" novalidate>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-2" data-key="form_name">Full Name *</label>
+                <input id="c-name" type="text" required placeholder="John Doe" class="w-full bg-surface-container-low px-4 py-3 text-on-surface text-sm border border-outline-variant focus:border-primary focus:outline-none transition-colors"/>
+              </div>
+              <div>
+                <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-2" data-key="form_email">Email *</label>
+                <input id="c-email" type="email" required placeholder="john@company.com" class="w-full bg-surface-container-low px-4 py-3 text-on-surface text-sm border border-outline-variant focus:border-primary focus:outline-none transition-colors"/>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-2" data-key="form_phone">Phone</label>
+                <input id="c-phone" type="tel" placeholder="+40 7XX XXX XXX" class="w-full bg-surface-container-low px-4 py-3 text-on-surface text-sm border border-outline-variant focus:border-primary focus:outline-none transition-colors"/>
+              </div>
+              <div>
+                <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-2" data-key="form_business">Business</label>
+                <input id="c-business" type="text" placeholder="Your Company" class="w-full bg-surface-container-low px-4 py-3 text-on-surface text-sm border border-outline-variant focus:border-primary focus:outline-none transition-colors"/>
+              </div>
+            </div>
+            <!-- Service pills -->
+            <div>
+              <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-3" data-key="form_service">Service Needed *</label>
+              <div class="flex flex-wrap gap-3">
+                <button type="button" class="srv-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-value="E-Commerce" data-key="pill_ecom">E-Commerce</button>
+                <button type="button" class="srv-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-value="Landing Page" data-key="pill_land">Landing Page</button>
+                <button type="button" class="srv-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-value="SaaS" data-key="pill_saas">SaaS App</button>
+                <button type="button" class="srv-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-value="Corporate" data-key="pill_corp">Corporate</button>
+                <button type="button" class="srv-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-value="Other" data-key="pill_other">Other</button>
+              </div>
+              <input type="hidden" id="c-service"/>
+            </div>
+            <!-- Budget -->
+            <div>
+              <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-3" data-key="form_budget">Budget Range</label>
+              <div class="flex flex-wrap gap-3">
+                <button type="button" class="bgt-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-secondary transition-colors" data-value="Under €500">Under €500</button>
+                <button type="button" class="bgt-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-secondary transition-colors" data-value="€500–€1.5k">€500–€1.5k</button>
+                <button type="button" class="bgt-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-secondary transition-colors" data-value="€1.5k–€5k">€1.5k–€5k</button>
+                <button type="button" class="bgt-pill px-4 py-2 bg-surface-container-low border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-secondary transition-colors" data-value="€5k+">€5k+</button>
+              </div>
+              <input type="hidden" id="c-budget"/>
+            </div>
+            <div>
+              <label class="block font-mono text-xs uppercase tracking-widest text-on-surface-variant mb-2" data-key="form_details">Project Details *</label>
+              <textarea id="c-details" rows="5" required placeholder="Describe your project, goals, and any references you love..." class="w-full bg-surface-container-low px-4 py-3 text-on-surface text-sm border border-outline-variant focus:border-primary focus:outline-none transition-colors resize-none"></textarea>
+            </div>
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="c-gdpr" required class="mt-1 accent-primary w-4 h-4 flex-shrink-0"/>
+              <label for="c-gdpr" class="text-xs text-on-surface-variant leading-relaxed" data-key="form_gdpr">I agree to the processing of my personal data in accordance with the Privacy Policy. No spam, ever.</label>
+            </div>
+            <div id="contactError" class="hidden p-4 bg-red-50 border border-red-200 text-red-700 text-sm"></div>
+            <button type="submit" id="contactSubmitBtn" class="shimmer w-full py-5 bg-primary text-white font-label uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-primary-container transition-colors">
+              <span id="contactBtnText" data-key="form_submit">Send & Receive Free Estimate</span>
+              <span id="contactSpinner" class="hidden"><svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer class="bg-on-surface text-white">
+  <div class="max-w-[1440px] mx-auto px-6 lg:px-24 py-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-20">
+      <div class="lg:col-span-2">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 bg-primary flex items-center justify-center text-white font-black text-xl">P</div>
+          <span class="font-black tracking-tighter uppercase">Pro Web Architects</span>
+        </div>
+        <p class="font-mono text-xs uppercase tracking-widest text-white/40 leading-loose mb-8" data-key="footer_tagline">Monolithic Precision.<br/>Digital Legacies Built to Last.</p>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500" style="animation:pulse-dot 2s infinite"></span>
+          <span class="font-mono text-xs text-white/40 uppercase tracking-widest" data-key="footer_status">All Systems Operational · 99ms</span>
+        </div>
+      </div>
+      <div>
+        <h5 class="font-mono text-xs uppercase tracking-widest text-primary mb-6" data-key="footer_services">Services</h5>
+        <ul class="space-y-4">
+          <li><a href="#services" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_ecom">E-Commerce</a></li>
+          <li><a href="#services" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_land">Landing Pages</a></li>
+          <li><a href="#services" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_saas">SaaS Platforms</a></li>
+          <li><a href="#services" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_corp">Corporate Sites</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-mono text-xs uppercase tracking-widest text-primary mb-6" data-key="footer_company">Company</h5>
+        <ul class="space-y-4">
+          <li><a href="#portfolio" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_portfolio">Portfolio</a></li>
+          <li><a href="#methodology" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_method">Methodology</a></li>
+          <li><a href="#pricing" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_pricing">Pricing</a></li>
+          <li><a href="#blog" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_blog">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-mono text-xs uppercase tracking-widest text-primary mb-6" data-key="footer_legal">Legal</h5>
+        <ul class="space-y-4">
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_privacy">Privacy Policy</a></li>
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_terms">Terms of Service</a></li>
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors" data-key="footer_gdpr_link">GDPR</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-mono text-xs uppercase tracking-widest text-primary mb-6" data-key="footer_social">Social</h5>
+        <ul class="space-y-4">
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors">GitHub</a></li>
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors">LinkedIn</a></li>
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors">Facebook</a></li>
+          <li><a href="#" class="font-mono text-xs uppercase tracking-widest text-white/40 hover:text-white transition-colors">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="font-mono text-xs text-white/30 uppercase tracking-widest" data-key="footer_copy">© 2026 Pro Web Architects. All Rights Reserved.</p>
+      <div class="flex gap-3">
+        <button class="lang-btn text-white/40 border-white/10" onclick="setLang('en')">EN</button>
+        <button class="lang-btn text-white/40 border-white/10" onclick="setLang('ro')">RO</button>
+        <button class="lang-btn text-white/40 border-white/10" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn text-white/40 border-white/10" onclick="setLang('de')">DE</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     SUCCESS MODAL
+════════════════════════════════════════════════════ -->
+<div id="successModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center;">
+  <div class="bg-surface max-w-md w-full mx-6 p-12 text-center relative">
+    <button onclick="document.getElementById('successModal').style.display='none'" class="absolute top-4 right-4"><span class="material-symbols-outlined">close</span></button>
+    <div class="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-6">
+      <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings:'FILL' 1">check_circle</span>
+    </div>
+    <h3 class="font-black text-2xl uppercase mb-3" data-key="success_title">Request Sent!</h3>
+    <p class="text-on-surface-variant text-sm leading-relaxed mb-8" data-key="success_msg">We'll get back to you within 24 hours with a detailed estimate and personalized proposal.</p>
+    <button onclick="document.getElementById('successModal').style.display='none'" class="shimmer w-full py-4 bg-primary text-white font-label uppercase tracking-widest text-sm" data-key="success_close">Close</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TEMPLATE MODAL
+════════════════════════════════════════════════════ -->
+<div id="templateModal" class="template-modal">
+  <div class="max-w-4xl w-full mx-6 bg-surface relative max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-surface border-b border-outline-variant px-8 py-4 flex justify-between items-center z-10">
+      <h3 class="font-black uppercase text-lg" id="templateTitle">Template Preview</h3>
+      <button onclick="closeTemplate()" class="w-9 h-9 flex items-center justify-center border border-outline-variant hover:border-primary transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="templateContent" class="p-8"></div>
+    <div class="sticky bottom-0 bg-surface border-t border-outline-variant px-8 py-4 flex gap-4">
+      <a href="#contact" onclick="closeTemplate()" class="shimmer flex-1 text-center py-4 bg-primary text-white font-label uppercase tracking-widest text-sm" data-key="tmpl_cta">Request This Template</a>
+      <button onclick="closeTemplate()" class="px-6 py-4 border border-outline-variant font-label text-xs uppercase tracking-widest hover:border-primary transition-colors" data-key="tmpl_close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+// ── AIRTABLE CONFIG ─────────────────────────────
+const AIRTABLE_ENDPOINT = '/submit'; // Uses Cloudflare Worker proxy
+
+// ── TRANSLATIONS ─────────────────────────────────
+const i18n = {
+  en: {
+    nav_services:"Services", nav_portfolio:"Portfolio", nav_methodology:"Methodology",
+    nav_pricing:"Pricing", nav_blog:"Blog", nav_contact:"Contact", nav_hire:"Start a Project",
+    hero_badge:"V.4.0 Engine · Now Accepting Projects", hero_status:"Available",
+    hero_line1:"Architecting", hero_line2:"Digital", hero_line3:"Legacies.",
+    hero_sub:"High-precision web engineering for modern brands. We don't build websites — we design monolithic systems that endure and convert.",
+    stat_projects:"Projects Shipped", stat_load:"Load Time", stat_uptime:"Uptime SLA", stat_rating:"Client Rating",
+    hero_cta1:"Start a Project", hero_cta2:"View Portfolio",
+    services_label:"What We Build", services_title:"Our\nServices",
+    services_sub:"Every project is engineered from scratch. No page builders. No compromises.",
+    svc_ecom_title:"E-Commerce", svc_ecom_desc:"Custom storefronts with real-time inventory, advanced filtering, and conversion-optimized checkout flows.",
+    svc_land_title:"Landing Pages", svc_land_desc:"High-converting campaign pages engineered for speed and impact. A/B testing ready.",
+    svc_saas_title:"SaaS Platforms", svc_saas_desc:"Full-stack web applications with auth, dashboards, billing integrations, and API architecture.",
+    svc_corp_title:"Corporate Sites", svc_corp_desc:"Enterprise-grade presentation sites with CMS integration, multilingual support, and GDPR compliance.",
+    svc_port_title:"Portfolio Sites", svc_port_desc:"Visually striking portfolio systems for creatives and agencies. Motion-rich, memorable, and fast.",
+    svc_custom_title:"Something Else?", svc_custom_desc:"Have a unique project in mind? We love complex challenges.",
+    svc_custom_cta:"Discuss Your Idea", see_template:"See Template",
+    port_label:"Archive 2024–2025", port_title:"The Big 20", port_sub:"A curated selection of industrial-grade web applications.",
+    view_all:"View All 20 Projects",
+    meth_label:"How We Work", meth_title:"The\nEngineering\nStandard",
+    meth_1_title:"Atomic Precision", meth_1_desc:"Every pixel verified. 4px grid system. Perfect alignment across all viewports.",
+    meth_2_title:"Monolithic Stack", meth_2_desc:"Modern tech on legacy-grade stability. Performance and maintainability first.",
+    meth_3_title:"Iterative Delivery", meth_3_desc:"Milestone-based delivery with client approval at every stage.",
+    proc_1_label:"Phase 01 — Discovery", proc_1_title:"Structural Audit", proc_1_desc:"Deep architectural audit of your business needs.",
+    proc_2_label:"Phase 02 — Design", proc_2_title:"Blueprint Construction", proc_2_desc:"High-fidelity wireframes built collaboratively.",
+    proc_3_label:"Phase 03 — Engineering", proc_3_title:"Core Construction", proc_3_desc:"Industrial-strength code. Iterative builds with weekly demos.",
+    proc_4_label:"Phase 04 — Launch", proc_4_title:"Deployment & Handoff", proc_4_desc:"Zero-downtime deployment. Full training included.",
+    proc_duration_1:"2–3 days", proc_duration_2:"3–5 days", proc_duration_3:"Variable", proc_duration_4:"1–2 days",
+    price_label:"Transparent Pricing", price_title:"Rate Card", price_sub:"No hidden fees. Every project starts with a fixed-scope agreement.",
+    plan_starter_label:"Starter", plan_from:"starting from", plan_starter_type:"Landing Page / Portfolio",
+    plan_pro_label:"Professional", plan_pro_type:"E-Commerce / Corporate", plan_popular:"Most Popular",
+    plan_enterprise_label:"Enterprise", plan_enterprise_type:"SaaS / Full-Stack App", plan_cta:"Get Started",
+    feat_custom_design:"Custom design", feat_responsive:"100% Responsive", feat_seo:"SEO Optimized",
+    feat_perf:"Sub-1s Performance", feat_support30:"30-day Support", feat_everything:"Everything in Starter",
+    feat_cms:"CMS Integration", feat_multilang:"Multilingual Support", feat_analytics:"Analytics Dashboard",
+    feat_support90:"90-day Support", feat_training:"Team Training", feat_everything_pro:"Everything in Pro",
+    feat_auth:"Auth & User Management", feat_api:"API Architecture", feat_billing:"Billing Integration",
+    feat_support180:"180-day Support", feat_sla:"SLA Guarantee",
+    price_note:"All prices are estimates. Final quote after discovery call.",
+    test_label:"Client Feedback", test_title:"What They\nSay",
+    test1_quote:'"We received the site in 3 weeks. It looks incredible and loads in under a second."',
+    test1_role:"Owner, Real Estate Agency",
+    test2_quote:'"The e-commerce platform handles 10x our previous traffic without breaking a sweat."',
+    test2_role:"CEO, Fashion Brand",
+    test3_quote:'"Our SaaS dashboard reduced churn by 40% since the redesign."',
+    test3_role:"CTO, SaaS Startup",
+    test4_quote:'"Delivered on time, on budget, and exceeds every specification."',
+    test4_role:"Director, Marketing Agency",
+    blog_label:"Resources & Insights", blog_title:"The\nCodebase", blog_all:"View All Articles",
+    blog1_cat:"Performance", blog1_title:"Achieving Sub-1s Load Times in 2025", blog1_date:"Mar 15, 2025",
+    blog1_desc:"A deep dive into modern performance techniques: code splitting, edge deployment, and image optimization.",
+    blog2_cat:"Security", blog2_title:"GDPR-Compliant Architecture for Modern Apps", blog2_date:"Feb 28, 2025",
+    blog2_desc:"How we design data flows and storage systems that are compliant by default.",
+    blog3_cat:"Conversion", blog3_title:"Why Custom Code Beats Templates Every Time", blog3_date:"Feb 10, 2025",
+    blog3_desc:"The real cost of page builders and why bespoke architecture consistently outperforms.",
+    read_more:"Read",
+    faq_label:"Got Questions?", faq_title:"FAQ",
+    faq1_q:"How long does a project take?", faq1_a:"A landing page takes 2–3 weeks. A full e-commerce site takes 4–8 weeks. We provide realistic timelines and stick to them.",
+    faq2_q:"Why not use WordPress or Shopify?", faq2_a:"Templates limit you. Custom code means superior performance, better security, unique design, and unlimited scalability.",
+    faq3_q:"What happens after launch?", faq3_a:"Full training on your CMS, 30–180 days post-launch support depending on plan, and optional monthly maintenance.",
+    faq4_q:"Do you work with international clients?", faq4_a:"Yes. We work across Europe and beyond. Communication in English, Romanian, French, and German.",
+    faq5_q:"How do payments work?", faq5_a:"50% upfront, 50% on delivery. Milestone-based payments available for larger projects.",
+    cta_title:"Ready to Build?", cta_sub:"Join brands that prioritize precision over trends. Let's architect your digital legacy.",
+    cta_btn1:"Start Project Brief", cta_btn2:"View Rate Card",
+    contact_label:"Get In Touch", contact_title:"Start Your\nProject.", contact_sub:"Fill in the form and receive a detailed estimate within 24 hours.",
+    contact_resp_label:"Response Time", contact_resp:"Under 24 Hours",
+    contact_priv_label:"Privacy", contact_priv:"100% Confidential",
+    contact_est_label:"Estimate", contact_est:"Always Free",
+    form_name:"Full Name *", form_email:"Email *", form_phone:"Phone", form_business:"Business",
+    form_service:"Service Needed *", form_budget:"Budget Range", form_details:"Project Details *",
+    form_gdpr:"I agree to the processing of my personal data. No spam, ever.",
+    form_submit:"Send & Receive Free Estimate",
+    pill_ecom:"E-Commerce", pill_land:"Landing Page", pill_saas:"SaaS App", pill_corp:"Corporate", pill_other:"Other",
+    footer_tagline:"Monolithic Precision.\nDigital Legacies Built to Last.",
+    footer_status:"All Systems Operational · 99ms",
+    footer_services:"Services", footer_company:"Company", footer_legal:"Legal", footer_social:"Social",
+    footer_ecom:"E-Commerce", footer_land:"Landing Pages", footer_saas:"SaaS Platforms", footer_corp:"Corporate",
+    footer_portfolio:"Portfolio", footer_method:"Methodology", footer_pricing:"Pricing", footer_blog:"Blog",
+    footer_privacy:"Privacy Policy", footer_terms:"Terms of Service", footer_gdpr_link:"GDPR",
+    footer_copy:"© 2026 Pro Web Architects. All Rights Reserved.",
+    success_title:"Request Sent!", success_msg:"We'll get back to you within 24 hours with a detailed estimate.",
+    success_close:"Close", tmpl_cta:"Request This Template", tmpl_close:"Close",
+  },
+  ro: {
+    nav_services:"Servicii", nav_portfolio:"Portofoliu", nav_methodology:"Metodologie",
+    nav_pricing:"Prețuri", nav_blog:"Blog", nav_contact:"Contact", nav_hire:"Începe Proiectul",
+    hero_badge:"V.4.0 · Acceptăm Proiecte Noi", hero_status:"Disponibil",
+    hero_line1:"Arhitecturăm", hero_line2:"Moșteniri", hero_line3:"Digitale.",
+    hero_sub:"Inginerie web de înaltă precizie pentru branduri moderne. Nu construim site-uri — proiectăm sisteme monolitice care rezistă și convertesc.",
+    stat_projects:"Proiecte Livrate", stat_load:"Timp Încărcare", stat_uptime:"SLA Uptime", stat_rating:"Rating Clienți",
+    hero_cta1:"Începe Proiectul", hero_cta2:"Vezi Portofoliu",
+    services_label:"Ce Construim", services_title:"Serviciile\nNoastre",
+    services_sub:"Fiecare proiect este construit de la zero. Fără page builders. Fără compromisuri.",
+    svc_ecom_title:"E-Commerce", svc_ecom_desc:"Magazine online custom cu inventar în timp real, filtrare avansată și checkout optimizat pentru conversii.",
+    svc_land_title:"Landing Pages", svc_land_desc:"Pagini de campanie cu conversie ridicată, construite pentru viteză și impact. Pregătite pentru A/B testing.",
+    svc_saas_title:"Platforme SaaS", svc_saas_desc:"Aplicații web full-stack cu autentificare, dashboard-uri, integrări de facturare și arhitectură API.",
+    svc_corp_title:"Site-uri Corporate", svc_corp_desc:"Site-uri de prezentare enterprise cu integrare CMS, suport multilingv și conformitate GDPR.",
+    svc_port_title:"Site-uri Portfolio", svc_port_desc:"Sisteme portfolio vizual impresionante pentru creativi și agenții. Bogate în animații, memorabile și rapide.",
+    svc_custom_title:"Altceva?", svc_custom_desc:"Ai un proiect unic în minte? Iubim provocările complexe.",
+    svc_custom_cta:"Discută Ideea Ta", see_template:"Vezi Templateul",
+    port_label:"Arhivă 2024–2025", port_title:"Cele Mai Bune 20",
+    port_sub:"O selecție curată de aplicații web de nivel industrial.",
+    view_all:"Vezi Toate 20 Proiectele",
+    meth_label:"Cum Lucrăm", meth_title:"Standardul\nde\nInginerie",
+    meth_1_title:"Precizie Atomică", meth_1_desc:"Fiecare pixel verificat. Grid de 4px. Aliniere perfectă pe toate device-urile.",
+    meth_2_title:"Stack Monolitic", meth_2_desc:"Tehnologie modernă pe stabilitate de nivel enterprise. Performanță și mentenabilitate pe termen lung.",
+    meth_3_title:"Livrare Iterativă", meth_3_desc:"Livrare bazată pe milestone-uri cu aprobarea clientului la fiecare etapă.",
+    proc_1_label:"Faza 01 — Descoperire", proc_1_title:"Audit Structural", proc_1_desc:"Audit arhitectural profund al nevoilor tale de business.",
+    proc_2_label:"Faza 02 — Design", proc_2_title:"Construcția Planului", proc_2_desc:"Wireframe-uri de înaltă fidelitate construite colaborativ.",
+    proc_3_label:"Faza 03 — Inginerie", proc_3_title:"Construcție Core", proc_3_desc:"Cod de nivel industrial. Build-uri iterative cu demo-uri săptămânale.",
+    proc_4_label:"Faza 04 — Lansare", proc_4_title:"Deploy & Predare", proc_4_desc:"Deploy fără downtime. Training complet inclus.",
+    proc_duration_1:"2–3 zile", proc_duration_2:"3–5 zile", proc_duration_3:"Variabil", proc_duration_4:"1–2 zile",
+    price_label:"Prețuri Transparente", price_title:"Rate Card", price_sub:"Fără costuri ascunse. Fiecare proiect începe cu un acord cu scopul fix.",
+    plan_starter_label:"Starter", plan_from:"de la", plan_starter_type:"Landing Page / Portfolio",
+    plan_pro_label:"Profesional", plan_pro_type:"E-Commerce / Corporate", plan_popular:"Cel Mai Popular",
+    plan_enterprise_label:"Enterprise", plan_enterprise_type:"SaaS / Aplicație Full-Stack", plan_cta:"Începe",
+    feat_custom_design:"Design custom", feat_responsive:"100% Responsive", feat_seo:"SEO Optimizat",
+    feat_perf:"Performanță sub 1s", feat_support30:"Support 30 zile", feat_everything:"Tot din Starter",
+    feat_cms:"Integrare CMS", feat_multilang:"Suport Multilingv", feat_analytics:"Dashboard Analytics",
+    feat_support90:"Support 90 zile", feat_training:"Training Echipă", feat_everything_pro:"Tot din Pro",
+    feat_auth:"Auth & Gestionare Utilizatori", feat_api:"Arhitectură API", feat_billing:"Integrare Facturare",
+    feat_support180:"Support 180 zile", feat_sla:"Garanție SLA",
+    price_note:"Toate prețurile sunt estimative. Ofertă finală după call de descoperire.",
+    test_label:"Feedback Clienți", test_title:"Ce Spun\nEi",
+    test1_quote:'"Am primit site-ul în 3 săptămâni. Arată incredibil și se încarcă în sub o secundă."',
+    test1_role:"Owner, Agenție Imobiliară",
+    test2_quote:'"Platforma e-commerce gestionează de 10 ori traficul anterior fără nicio problemă."',
+    test2_role:"CEO, Brand Fashion",
+    test3_quote:'"Dashboard-ul nostru SaaS a redus churn-ul cu 40% de la redesign."',
+    test3_role:"CTO, SaaS Startup",
+    test4_quote:'"Livrat la timp, în buget și depășind toate specificațiile."',
+    test4_role:"Director, Agenție Marketing",
+    blog_label:"Resurse & Insights", blog_title:"Codebase", blog_all:"Vezi Toate Articolele",
+    blog1_cat:"Performanță", blog1_title:"Cum să Obții Timp de Încărcare sub 1s în 2025", blog1_date:"15 Mar 2025",
+    blog1_desc:"O analiză profundă a tehnicilor moderne de performanță: code splitting, edge deployment.",
+    blog2_cat:"Securitate", blog2_title:"Arhitectură Conformă GDPR pentru Aplicații Moderne", blog2_date:"28 Feb 2025",
+    blog2_desc:"Cum proiectăm fluxuri de date conforme GDPR by default, nu ca afterthought.",
+    blog3_cat:"Conversie", blog3_title:"De Ce Codul Custom Câștigă Față de Template-uri", blog3_date:"10 Feb 2025",
+    blog3_desc:"Costul real al page builder-ilor și de ce arhitectura bespoke convertește mai bine.",
+    read_more:"Citește",
+    faq_label:"Ai Întrebări?", faq_title:"FAQ",
+    faq1_q:"Cât durează un proiect?", faq1_a:"O landing page durează 2–3 săptămâni. Un site e-commerce complet durează 4–8 săptămâni.",
+    faq2_q:"De ce nu folosiți WordPress sau Shopify?", faq2_a:"Template-urile limitează. Codul custom înseamnă performanță superioară, securitate mai bună și scalabilitate nelimitată.",
+    faq3_q:"Ce se întâmplă după lansare?", faq3_a:"Training complet, 30–180 zile support post-lansare și pachete opționale de mentenanță lunară.",
+    faq4_q:"Lucrați cu clienți internaționali?", faq4_a:"Da. Lucrăm cu clienți din toată Europa. Comunicare în engleză, română, franceză și germană.",
+    faq5_q:"Cum funcționează plățile?", faq5_a:"50% avans, 50% la livrare. Plăți bazate pe milestone-uri disponibile pentru proiecte mai mari.",
+    cta_title:"Gata să Construim?", cta_sub:"Alătură-te brandurilor care prioritizează precizia. Hai să arhitecturăm moștenirea ta digitală.",
+    cta_btn1:"Trimite Brief Proiect", cta_btn2:"Vezi Rate Card",
+    contact_label:"Ia Legătura", contact_title:"Începe\nProiectul Tău.", contact_sub:"Completează formularul și primești o estimare detaliată în 24 ore.",
+    contact_resp_label:"Timp Răspuns", contact_resp:"Sub 24 Ore",
+    contact_priv_label:"Confidențialitate", contact_priv:"100% Confidențial",
+    contact_est_label:"Estimare", contact_est:"Întotdeauna Gratuită",
+    form_name:"Nume Complet *", form_email:"Email *", form_phone:"Telefon", form_business:"Business",
+    form_service:"Serviciu Necesar *", form_budget:"Buget Estimat", form_details:"Detalii Proiect *",
+    form_gdpr:"Sunt de acord cu prelucrarea datelor mele personale. Fără spam, niciodată.",
+    form_submit:"Trimite & Primește Estimarea Gratuită",
+    pill_ecom:"E-Commerce", pill_land:"Landing Page", pill_saas:"Aplicație SaaS", pill_corp:"Corporate", pill_other:"Altul",
+    footer_tagline:"Precizie Monolitică.\nMoșteniri Digitale Construite să Dureze.",
+    footer_status:"Toate Sistemele Operaționale · 99ms",
+    footer_services:"Servicii", footer_company:"Companie", footer_legal:"Legal", footer_social:"Social",
+    footer_ecom:"E-Commerce", footer_land:"Landing Pages", footer_saas:"Platforme SaaS", footer_corp:"Corporate",
+    footer_portfolio:"Portofoliu", footer_method:"Metodologie", footer_pricing:"Prețuri", footer_blog:"Blog",
+    footer_privacy:"Politică Confidențialitate", footer_terms:"Termeni și Condiții", footer_gdpr_link:"GDPR",
+    footer_copy:"© 2026 Pro Web Architects. Toate Drepturile Rezervate.",
+    success_title:"Cerere Trimisă!", success_msg:"Îți răspundem în 24 ore cu o estimare detaliată și o propunere personalizată.",
+    success_close:"Închide", tmpl_cta:"Solicită Acest Template", tmpl_close:"Închide",
+  },
+  fr: {
+    nav_services:"Services", nav_portfolio:"Portfolio", nav_methodology:"Méthodologie",
+    nav_pricing:"Tarifs", nav_blog:"Blog", nav_contact:"Contact", nav_hire:"Démarrer",
+    hero_badge:"V.4.0 · Projets Acceptés", hero_status:"Disponible",
+    hero_line1:"Architecture", hero_line2:"Digitale", hero_line3:"Durable.",
+    hero_sub:"Ingénierie web haute précision pour les marques modernes. Nous ne construisons pas des sites — nous concevons des systèmes monolithiques qui perdurent.",
+    stat_projects:"Projets Livrés", stat_load:"Temps Chargement", stat_uptime:"SLA Disponibilité", stat_rating:"Avis Clients",
+    hero_cta1:"Démarrer un Projet", hero_cta2:"Voir Portfolio",
+    services_label:"Ce Que Nous Construisons", services_title:"Nos\nServices",
+    services_sub:"Chaque projet est conçu from scratch. Aucun page builder. Aucun compromis.",
+    svc_ecom_title:"E-Commerce", svc_ecom_desc:"Boutiques sur mesure avec inventaire en temps réel et tunnels de conversion optimisés.",
+    svc_land_title:"Landing Pages", svc_land_desc:"Pages de campagne à fort taux de conversion, conçues pour la vitesse et l'impact.",
+    svc_saas_title:"Plateformes SaaS", svc_saas_desc:"Applications web full-stack avec authentification, tableaux de bord et architecture API.",
+    svc_corp_title:"Sites Corporate", svc_corp_desc:"Sites enterprise avec intégration CMS, support multilingue et conformité RGPD.",
+    svc_port_title:"Sites Portfolio", svc_port_desc:"Systèmes portfolio visuellement frappants pour créatifs et agences.",
+    svc_custom_title:"Autre chose?", svc_custom_desc:"Un projet unique en tête? Nous adorons les défis complexes.",
+    svc_custom_cta:"Discuter Votre Idée", see_template:"Voir Template",
+    port_label:"Archive 2024–2025", port_title:"Le Top 20", port_sub:"Une sélection de web apps de qualité industrielle.",
+    view_all:"Voir les 20 Projets",
+    meth_label:"Comment Nous Travaillons", meth_title:"Le Standard\nd'Ingénierie",
+    meth_1_title:"Précision Atomique", meth_1_desc:"Chaque pixel vérifié. Système de grille 4px.",
+    meth_2_title:"Stack Monolithique", meth_2_desc:"Tech moderne sur stabilité enterprise. Performance en priorité.",
+    meth_3_title:"Livraison Itérative", meth_3_desc:"Livraison par jalons avec approbation client à chaque étape.",
+    proc_1_label:"Phase 01 — Découverte", proc_1_title:"Audit Structurel", proc_1_desc:"Audit architectural profond de vos besoins.",
+    proc_2_label:"Phase 02 — Design", proc_2_title:"Construction du Plan", proc_2_desc:"Maquettes haute fidélité construites collaborativement.",
+    proc_3_label:"Phase 03 — Ingénierie", proc_3_title:"Construction Core", proc_3_desc:"Code de niveau industriel. Builds itératifs avec démos hebdomadaires.",
+    proc_4_label:"Phase 04 — Lancement", proc_4_title:"Déploiement & Transfert", proc_4_desc:"Déploiement sans interruption. Formation complète incluse.",
+    proc_duration_1:"2–3 jours", proc_duration_2:"3–5 jours", proc_duration_3:"Variable", proc_duration_4:"1–2 jours",
+    price_label:"Tarifs Transparents", price_title:"Grille Tarifaire", price_sub:"Aucun frais caché. Chaque projet commence par un accord à périmètre fixe.",
+    plan_starter_label:"Starter", plan_from:"à partir de", plan_starter_type:"Landing Page / Portfolio",
+    plan_pro_label:"Professionnel", plan_pro_type:"E-Commerce / Corporate", plan_popular:"Le Plus Populaire",
+    plan_enterprise_label:"Enterprise", plan_enterprise_type:"SaaS / Application Full-Stack", plan_cta:"Commencer",
+    feat_custom_design:"Design sur mesure", feat_responsive:"100% Responsive", feat_seo:"SEO Optimisé",
+    feat_perf:"Performance sous 1s", feat_support30:"Support 30 jours", feat_everything:"Tout du Starter",
+    feat_cms:"Intégration CMS", feat_multilang:"Support Multilingue", feat_analytics:"Dashboard Analytics",
+    feat_support90:"Support 90 jours", feat_training:"Formation Équipe", feat_everything_pro:"Tout du Pro",
+    feat_auth:"Auth & Gestion Utilisateurs", feat_api:"Architecture API", feat_billing:"Intégration Facturation",
+    feat_support180:"Support 180 jours", feat_sla:"Garantie SLA",
+    price_note:"Tous les prix sont estimatifs. Devis final après appel de découverte.",
+    test_label:"Retours Clients", test_title:"Ce Qu'ils\nDisent",
+    test1_quote:'"Nous avons reçu le site en 3 semaines. Il est incroyable et se charge en moins d\'une seconde."',
+    test1_role:"Directeur, Agence Immobilière",
+    test2_quote:'"La plateforme e-commerce gère 10x notre trafic précédent sans effort."',
+    test2_role:"PDG, Marque Mode",
+    test3_quote:'"Notre dashboard SaaS a réduit le churn de 40% depuis la refonte."',
+    test3_role:"CTO, Startup SaaS",
+    test4_quote:'"Livré dans les délais, dans le budget, dépassant toutes les spécifications."',
+    test4_role:"Directeur, Agence Marketing",
+    blog_label:"Ressources & Insights", blog_title:"La\nCodebase", blog_all:"Voir Tous les Articles",
+    blog1_cat:"Performance", blog1_title:"Atteindre un Temps de Chargement sous 1s en 2025", blog1_date:"15 Mar 2025",
+    blog1_desc:"Un plongeon dans les techniques modernes: code splitting, edge deployment.",
+    blog2_cat:"Sécurité", blog2_title:"Architecture Conforme RGPD pour Apps Modernes", blog2_date:"28 Fév 2025",
+    blog2_desc:"Comment nous concevons des flux de données conformes RGPD by default.",
+    blog3_cat:"Conversion", blog3_title:"Pourquoi le Code Sur Mesure Bat les Templates", blog3_date:"10 Fév 2025",
+    blog3_desc:"Le vrai coût des page builders et pourquoi l'architecture sur mesure convertit mieux.",
+    read_more:"Lire",
+    faq_label:"Des Questions?", faq_title:"FAQ",
+    faq1_q:"Combien de temps dure un projet?", faq1_a:"Une landing page prend 2–3 semaines. Un site e-commerce complet prend 4–8 semaines.",
+    faq2_q:"Pourquoi pas WordPress ou Shopify?", faq2_a:"Les templates vous limitent. Le code custom signifie performance supérieure, meilleure sécurité, design unique.",
+    faq3_q:"Que se passe-t-il après le lancement?", faq3_a:"Formation complète, 30–180 jours de support post-lancement selon le plan.",
+    faq4_q:"Travaillez-vous avec des clients internationaux?", faq4_a:"Oui. Nous travaillons dans toute l'Europe. Communication en anglais, roumain, français et allemand.",
+    faq5_q:"Comment fonctionnent les paiements?", faq5_a:"50% d'avance, 50% à la livraison. Paiements par jalons disponibles pour les grands projets.",
+    cta_title:"Prêt à Construire?", cta_sub:"Rejoignez les marques qui privilégient la précision. Architecturons votre héritage digital.",
+    cta_btn1:"Démarrer un Brief", cta_btn2:"Voir les Tarifs",
+    contact_label:"Contactez-nous", contact_title:"Démarrez\nVotre Projet.", contact_sub:"Remplissez le formulaire et recevez un devis détaillé sous 24h.",
+    contact_resp_label:"Temps de Réponse", contact_resp:"Moins de 24h",
+    contact_priv_label:"Confidentialité", contact_priv:"100% Confidentiel",
+    contact_est_label:"Estimation", contact_est:"Toujours Gratuite",
+    form_name:"Nom Complet *", form_email:"Email *", form_phone:"Téléphone", form_business:"Entreprise",
+    form_service:"Service Souhaité *", form_budget:"Budget Estimé", form_details:"Détails du Projet *",
+    form_gdpr:"J'accepte le traitement de mes données personnelles. Aucun spam, jamais.",
+    form_submit:"Envoyer & Recevoir un Devis Gratuit",
+    pill_ecom:"E-Commerce", pill_land:"Landing Page", pill_saas:"App SaaS", pill_corp:"Corporate", pill_other:"Autre",
+    footer_tagline:"Précision Monolithique.\nHéritages Digitaux Construits pour Durer.",
+    footer_status:"Tous Systèmes Opérationnels · 99ms",
+    footer_services:"Services", footer_company:"Entreprise", footer_legal:"Légal", footer_social:"Réseaux",
+    footer_ecom:"E-Commerce", footer_land:"Landing Pages", footer_saas:"Plateformes SaaS", footer_corp:"Corporate",
+    footer_portfolio:"Portfolio", footer_method:"Méthodologie", footer_pricing:"Tarifs", footer_blog:"Blog",
+    footer_privacy:"Politique de Confidentialité", footer_terms:"Conditions d'Utilisation", footer_gdpr_link:"RGPD",
+    footer_copy:"© 2026 Pro Web Architects. Tous Droits Réservés.",
+    success_title:"Demande Envoyée!", success_msg:"Nous vous répondrons sous 24h avec un devis détaillé.",
+    success_close:"Fermer", tmpl_cta:"Demander ce Template", tmpl_close:"Fermer",
+  },
+  de: {
+    nav_services:"Leistungen", nav_portfolio:"Portfolio", nav_methodology:"Methodik",
+    nav_pricing:"Preise", nav_blog:"Blog", nav_contact:"Kontakt", nav_hire:"Projekt Starten",
+    hero_badge:"V.4.0 · Projekte werden angenommen", hero_status:"Verfügbar",
+    hero_line1:"Digital", hero_line2:"Legacies", hero_line3:"Gebaut.",
+    hero_sub:"Hochpräzises Web-Engineering für moderne Marken. Wir bauen keine Websites — wir entwerfen monolithische Systeme, die standhalten.",
+    stat_projects:"Projekte Geliefert", stat_load:"Ladezeit", stat_uptime:"Uptime SLA", stat_rating:"Kundenbewertung",
+    hero_cta1:"Projekt Starten", hero_cta2:"Portfolio Ansehen",
+    services_label:"Was Wir Bauen", services_title:"Unsere\nLeistungen",
+    services_sub:"Jedes Projekt wird von Grund auf neu entwickelt. Keine Page Builder. Keine Kompromisse.",
+    svc_ecom_title:"E-Commerce", svc_ecom_desc:"Individuelle Shops mit Echtzeit-Inventar und konversionsoptimierten Checkout-Flows.",
+    svc_land_title:"Landing Pages", svc_land_desc:"Hochkonvertierende Kampagnenseiten für Geschwindigkeit und Wirkung.",
+    svc_saas_title:"SaaS-Plattformen", svc_saas_desc:"Full-Stack-Webanwendungen mit Auth, Dashboards und API-Architektur.",
+    svc_corp_title:"Corporate-Websites", svc_corp_desc:"Enterprise-Präsentationsseiten mit CMS, Mehrsprachigkeit und DSGVO-Konformität.",
+    svc_port_title:"Portfolio-Websites", svc_port_desc:"Visuell beeindruckende Portfolio-Systeme für Kreative und Agenturen.",
+    svc_custom_title:"Etwas anderes?", svc_custom_desc:"Ein einzigartiges Projekt im Sinn? Wir lieben komplexe Herausforderungen.",
+    svc_custom_cta:"Idee Besprechen", see_template:"Template Ansehen",
+    port_label:"Archiv 2024–2025", port_title:"Die Top 20", port_sub:"Eine kuratierte Auswahl industrieller Web-Anwendungen.",
+    view_all:"Alle 20 Projekte Ansehen",
+    meth_label:"Wie Wir Arbeiten", meth_title:"Der\nIngenieur-\nstandard",
+    meth_1_title:"Atomare Präzision", meth_1_desc:"Jedes Pixel überprüft. 4px-Rastersystem. Perfekte Ausrichtung.",
+    meth_2_title:"Monolithischer Stack", meth_2_desc:"Moderne Technologie auf enterprise-gradiger Stabilität.",
+    meth_3_title:"Iterative Lieferung", meth_3_desc:"Meilenstein-basierte Lieferung mit Kundengenehmigung.",
+    proc_1_label:"Phase 01 — Entdeckung", proc_1_title:"Strukturelles Audit", proc_1_desc:"Tiefes Architektur-Audit Ihrer Geschäftsanforderungen.",
+    proc_2_label:"Phase 02 — Design", proc_2_title:"Blueprint-Erstellung", proc_2_desc:"Hochauflösende Wireframes kollaborativ erstellt.",
+    proc_3_label:"Phase 03 — Engineering", proc_3_title:"Kernkonstruktion", proc_3_desc:"Industriestarker Code. Iterative Builds mit wöchentlichen Demos.",
+    proc_4_label:"Phase 04 — Launch", proc_4_title:"Deployment & Übergabe", proc_4_desc:"Zero-Downtime-Deployment. Vollständiges Training inklusive.",
+    proc_duration_1:"2–3 Tage", proc_duration_2:"3–5 Tage", proc_duration_3:"Variabel", proc_duration_4:"1–2 Tage",
+    price_label:"Transparente Preise", price_title:"Preisliste", price_sub:"Keine versteckten Kosten. Jedes Projekt beginnt mit einem Festumfangsvertrag.",
+    plan_starter_label:"Starter", plan_from:"ab", plan_starter_type:"Landing Page / Portfolio",
+    plan_pro_label:"Professionell", plan_pro_type:"E-Commerce / Corporate", plan_popular:"Am Beliebtesten",
+    plan_enterprise_label:"Enterprise", plan_enterprise_type:"SaaS / Full-Stack App", plan_cta:"Loslegen",
+    feat_custom_design:"Individuelles Design", feat_responsive:"100% Responsive", feat_seo:"SEO Optimiert",
+    feat_perf:"Ladezeit unter 1s", feat_support30:"30 Tage Support", feat_everything:"Alles aus Starter",
+    feat_cms:"CMS Integration", feat_multilang:"Mehrsprachiger Support", feat_analytics:"Analytics Dashboard",
+    feat_support90:"90 Tage Support", feat_training:"Team-Schulung", feat_everything_pro:"Alles aus Pro",
+    feat_auth:"Auth & Benutzerverwaltung", feat_api:"API-Architektur", feat_billing:"Abrechnungsintegration",
+    feat_support180:"180 Tage Support", feat_sla:"SLA-Garantie",
+    price_note:"Alle Preise sind Schätzungen. Endgültiges Angebot nach Discovery-Call.",
+    test_label:"Kundenfeedback", test_title:"Was Sie\nSagen",
+    test1_quote:'"Wir haben die Website in 3 Wochen erhalten. Sie sieht großartig aus und lädt in unter einer Sekunde."',
+    test1_role:"Inhaber, Immobilienagentur",
+    test2_quote:'"Die E-Commerce-Plattform bewältigt das 10-fache unseres früheren Traffics mühelos."',
+    test2_role:"CEO, Modemarke",
+    test3_quote:'"Unser SaaS-Dashboard reduzierte die Abwanderung seit dem Redesign um 40%."',
+    test3_role:"CTO, SaaS-Startup",
+    test4_quote:'"Pünktlich, im Budget und übertrifft jede Spezifikation."',
+    test4_role:"Direktor, Marketingagentur",
+    blog_label:"Ressourcen & Insights", blog_title:"Die\nCodebase", blog_all:"Alle Artikel Ansehen",
+    blog1_cat:"Performance", blog1_title:"Ladezeiten unter 1s in 2025 erreichen", blog1_date:"15. Mär 2025",
+    blog1_desc:"Ein tiefer Einblick in moderne Performance-Techniken: Code Splitting, Edge Deployment.",
+    blog2_cat:"Sicherheit", blog2_title:"DSGVO-konforme Architektur für moderne Apps", blog2_date:"28. Feb 2025",
+    blog2_desc:"Wie wir Datenflüsse konzipieren, die by default DSGVO-konform sind.",
+    blog3_cat:"Konversion", blog3_title:"Warum Custom Code Templates immer schlägt", blog3_date:"10. Feb 2025",
+    blog3_desc:"Die wahren Kosten von Page Buildern und warum maßgeschneiderte Architektur besser konvertiert.",
+    read_more:"Lesen",
+    faq_label:"Haben Sie Fragen?", faq_title:"FAQ",
+    faq1_q:"Wie lange dauert ein Projekt?", faq1_a:"Eine Landing Page dauert 2–3 Wochen. Eine vollständige E-Commerce-Site dauert 4–8 Wochen.",
+    faq2_q:"Warum nicht WordPress oder Shopify?", faq2_a:"Templates begrenzen Sie. Custom Code bedeutet überlegene Performance, bessere Sicherheit, einzigartiges Design.",
+    faq3_q:"Was passiert nach dem Launch?", faq3_a:"Vollständiges Training, 30–180 Tage Post-Launch-Support je nach Plan.",
+    faq4_q:"Arbeiten Sie mit internationalen Kunden?", faq4_a:"Ja. Wir arbeiten europaweit. Kommunikation auf Englisch, Rumänisch, Französisch und Deutsch.",
+    faq5_q:"Wie funktioniert die Zahlung?", faq5_a:"50% im Voraus, 50% bei Lieferung. Meilenstein-basierte Zahlungen für größere Projekte verfügbar.",
+    cta_title:"Bereit zu Bauen?", cta_sub:"Schließen Sie sich Marken an, die Präzision priorisieren. Lassen Sie uns Ihr digitales Erbe entwerfen.",
+    cta_btn1:"Projektbrief Starten", cta_btn2:"Preisliste Ansehen",
+    contact_label:"Kontakt aufnehmen", contact_title:"Ihr Projekt\nStarten.", contact_sub:"Formular ausfüllen und detaillierte Schätzung in 24h erhalten.",
+    contact_resp_label:"Antwortzeit", contact_resp:"Unter 24 Stunden",
+    contact_priv_label:"Datenschutz", contact_priv:"100% Vertraulich",
+    contact_est_label:"Schätzung", contact_est:"Immer Kostenlos",
+    form_name:"Vollständiger Name *", form_email:"E-Mail *", form_phone:"Telefon", form_business:"Unternehmen",
+    form_service:"Benötigter Service *", form_budget:"Budgetrahmen", form_details:"Projektdetails *",
+    form_gdpr:"Ich stimme der Verarbeitung meiner personenbezogenen Daten zu. Kein Spam, niemals.",
+    form_submit:"Senden & Kostenlose Schätzung Erhalten",
+    pill_ecom:"E-Commerce", pill_land:"Landing Page", pill_saas:"SaaS App", pill_corp:"Corporate", pill_other:"Anderes",
+    footer_tagline:"Monolithische Präzision.\nDigitale Erben für die Ewigkeit gebaut.",
+    footer_status:"Alle Systeme Betriebsbereit · 99ms",
+    footer_services:"Leistungen", footer_company:"Unternehmen", footer_legal:"Rechtliches", footer_social:"Social Media",
+    footer_ecom:"E-Commerce", footer_land:"Landing Pages", footer_saas:"SaaS-Plattformen", footer_corp:"Corporate",
+    footer_portfolio:"Portfolio", footer_method:"Methodik", footer_pricing:"Preise", footer_blog:"Blog",
+    footer_privacy:"Datenschutzerklärung", footer_terms:"Nutzungsbedingungen", footer_gdpr_link:"DSGVO",
+    footer_copy:"© 2026 Pro Web Architects. Alle Rechte Vorbehalten.",
+    success_title:"Anfrage Gesendet!", success_msg:"Wir melden uns innerhalb von 24h mit einem detaillierten Angebot.",
+    success_close:"Schließen", tmpl_cta:"Dieses Template Anfragen", tmpl_close:"Schließen",
+  }
+};
+
+// ── TEMPLATE PREVIEWS ────────────────────────────
+const templates = {
+  ecommerce: {
+    title:"E-Commerce — Full Custom Storefront",
+    html:`<div class="space-y-6">
+      <!-- Hero preview -->
+      <div class="bg-[#fafafa] border border-outline-variant overflow-hidden">
+        <div class="bg-[#1960a3] px-6 py-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-white font-bold">SHOP TEMPLATE · LIVE PREVIEW</span>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+          </div>
+        </div>
+        <div class="p-4 bg-white">
+          <div class="flex gap-3 mb-4">
+            <div class="flex-1 grid grid-cols-3 gap-3">
+              <div class="border border-gray-200 p-3 hover:border-blue-500 transition-colors cursor-pointer group">
+                <div class="aspect-square bg-blue-50 mb-2 flex items-center justify-center text-2xl">👟</div>
+                <div class="font-bold text-xs">Air Max Pro</div>
+                <div class="text-blue-600 text-xs font-bold">$129.00</div>
+                <div class="flex gap-1 mt-1">
+                  <span class="text-yellow-400 text-xs">★★★★★</span>
+                </div>
+                <button class="mt-2 w-full bg-[#1960a3] text-white text-xs py-1 hover:bg-blue-700 transition-colors">Add to Cart</button>
+              </div>
+              <div class="border border-blue-500 p-3 relative cursor-pointer group">
+                <div class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1">SALE</div>
+                <div class="aspect-square bg-purple-50 mb-2 flex items-center justify-center text-2xl">👜</div>
+                <div class="font-bold text-xs">Luxe Bag</div>
+                <div class="text-blue-600 text-xs font-bold">$249.00 <span class="text-gray-400 line-through">$320</span></div>
+                <div class="flex gap-1 mt-1"><span class="text-yellow-400 text-xs">★★★★☆</span></div>
+                <button class="mt-2 w-full bg-[#1960a3] text-white text-xs py-1 hover:bg-blue-700 transition-colors">Add to Cart</button>
+              </div>
+              <div class="border border-gray-200 p-3 cursor-pointer group hover:border-blue-500 transition-colors">
+                <div class="aspect-square bg-green-50 mb-2 flex items-center justify-center text-2xl">🧢</div>
+                <div class="font-bold text-xs">Sport Cap</div>
+                <div class="text-blue-600 text-xs font-bold">$49.00</div>
+                <div class="flex gap-1 mt-1"><span class="text-yellow-400 text-xs">★★★★★</span></div>
+                <button class="mt-2 w-full bg-[#1960a3] text-white text-xs py-1 hover:bg-blue-700 transition-colors">Add to Cart</button>
+              </div>
+            </div>
+            <div class="w-48 border border-gray-200 p-3 bg-gray-50">
+              <div class="font-bold text-xs mb-3 flex items-center justify-between">
+                🛒 Cart (2) <span class="text-blue-600">$178</span>
+              </div>
+              <div class="space-y-2 text-xs text-gray-600 mb-3">
+                <div class="flex justify-between"><span>Air Max Pro</span><span>$129</span></div>
+                <div class="flex justify-between"><span>Sport Cap</span><span>$49</span></div>
+                <div class="border-t pt-2 flex justify-between font-bold text-gray-900"><span>Total</span><span>$178</span></div>
+              </div>
+              <button class="w-full bg-[#1960a3] text-white text-xs py-2 font-bold hover:bg-blue-700 transition-colors">Checkout →</button>
+              <div class="text-center text-xs text-gray-400 mt-2">🔒 Secure · Free Shipping</div>
+            </div>
+          </div>
+          <!-- Filters bar -->
+          <div class="flex gap-2 text-xs">
+            <span class="px-3 py-1 bg-[#1960a3] text-white font-mono">All</span>
+            <span class="px-3 py-1 border border-gray-200 font-mono hover:border-blue-500 cursor-pointer transition-colors">Shoes</span>
+            <span class="px-3 py-1 border border-gray-200 font-mono hover:border-blue-500 cursor-pointer transition-colors">Bags</span>
+            <span class="px-3 py-1 border border-gray-200 font-mono hover:border-blue-500 cursor-pointer transition-colors">Accessories</span>
+            <span class="px-3 py-1 border border-gray-200 font-mono hover:border-blue-500 cursor-pointer transition-colors">Sale</span>
+            <div class="ml-auto flex gap-2">
+              <span class="px-3 py-1 border border-gray-200 font-mono cursor-pointer">Sort: Popular ▼</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Features grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">🛒</div><div class="font-bold text-xs uppercase mb-1">Cart & Wishlist</div>
+          <div class="text-on-surface-variant text-xs">Real-time cart sync, persistent wishlist, guest checkout</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">📦</div><div class="font-bold text-xs uppercase mb-1">Live Inventory</div>
+          <div class="text-on-surface-variant text-xs">Stock tracking, low-stock alerts, variant management</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">💳</div><div class="font-bold text-xs uppercase mb-1">Payments</div>
+          <div class="text-on-surface-variant text-xs">Stripe, PayPal, crypto — multi-currency support</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">⭐</div><div class="font-bold text-xs uppercase mb-1">Reviews</div>
+          <div class="text-on-surface-variant text-xs">Verified reviews, photo uploads, moderation panel</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">📊</div><div class="font-bold text-xs uppercase mb-1">Analytics</div>
+          <div class="text-on-surface-variant text-xs">Sales dashboard, conversion tracking, revenue reports</div>
+        </div>
+        <div class="p-4 border border-primary bg-primary/5">
+          <div class="font-black text-xl text-primary mb-1">€2.500</div>
+          <div class="text-on-surface-variant text-xs">Starting from · 4–6 weeks delivery</div>
+        </div>
+      </div>
+    </div>`
+  },
+  landing: {
+    title:"Landing Page — High-Converting Campaign",
+    html:`<div class="space-y-6">
+      <div class="border border-outline-variant overflow-hidden">
+        <div class="bg-gray-800 px-6 py-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-white font-bold">LANDING PAGE · LIVE PREVIEW</span>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+          </div>
+        </div>
+        <!-- Hero section mock -->
+        <div class="bg-[#3700b2] p-6 text-white">
+          <div class="inline-flex items-center gap-2 bg-white/10 px-3 py-1 text-xs font-mono mb-4">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            Limited Spots · April 2026
+          </div>
+          <h2 class="font-black text-3xl uppercase tracking-tighter leading-tight mb-3">Your Business<br/><span class="text-yellow-300">Deserves More</span><br/>Than a Template.</h2>
+          <p class="text-purple-200 text-sm mb-4 max-w-md">Custom web architecture that converts. Sub-1s load times. Built from scratch for your brand.</p>
+          <div class="flex gap-3">
+            <button class="bg-white text-[#3700b2] px-5 py-2 font-bold text-sm hover:bg-yellow-300 transition-colors">Get Free Estimate →</button>
+            <button class="border border-white/30 text-white px-5 py-2 text-sm hover:bg-white/10 transition-colors">See Portfolio</button>
+          </div>
+        </div>
+        <!-- Social proof -->
+        <div class="bg-white p-4 flex flex-wrap gap-6 border-b border-gray-100">
+          <div class="flex items-center gap-2"><span class="text-yellow-400">★★★★★</span><span class="text-xs text-gray-500">5.0 · 12 clients</span></div>
+          <div class="flex items-center gap-2"><span class="text-green-500 text-sm">✓</span><span class="text-xs text-gray-500">Response in 24h</span></div>
+          <div class="flex items-center gap-2"><span class="text-blue-500 text-sm">🔒</span><span class="text-xs text-gray-500">100% Confidential</span></div>
+        </div>
+        <!-- Mini form -->
+        <div class="bg-gray-50 p-4">
+          <div class="text-xs font-bold uppercase mb-3 text-gray-700">Request Free Estimate</div>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <input class="border border-gray-200 px-3 py-2 text-xs bg-white focus:border-blue-500 focus:outline-none" placeholder="Your Name"/>
+            <input class="border border-gray-200 px-3 py-2 text-xs bg-white focus:border-blue-500 focus:outline-none" placeholder="Email"/>
+          </div>
+          <textarea class="w-full border border-gray-200 px-3 py-2 text-xs bg-white focus:border-blue-500 focus:outline-none resize-none mb-2" rows="2" placeholder="Tell us about your project..."></textarea>
+          <button class="w-full bg-[#3700b2] text-white text-xs py-3 font-bold hover:bg-purple-700 transition-colors">Send & Receive Free Estimate</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="p-4 border border-outline-variant bg-surface-container-low text-center">
+          <div class="font-black text-2xl text-primary">98</div><div class="text-xs text-on-surface-variant">Lighthouse Score</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low text-center">
+          <div class="font-black text-2xl text-primary">&lt;1s</div><div class="text-xs text-on-surface-variant">Load Time</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low text-center">
+          <div class="font-black text-2xl text-primary">A/B</div><div class="text-xs text-on-surface-variant">Testing Ready</div>
+        </div>
+        <div class="p-4 border border-primary bg-primary/5 text-center">
+          <div class="font-black text-2xl text-primary">€500</div><div class="text-xs text-on-surface-variant">Starting from</div>
+        </div>
+      </div>
+    </div>`
+  },
+  saas: {
+    title:"SaaS Platform — Full-Stack Application",
+    html:`<div class="space-y-6">
+      <div class="border border-outline-variant overflow-hidden">
+        <div class="bg-[#0d0d1a] px-6 py-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-purple-300 font-bold">SAAS DASHBOARD · LIVE PREVIEW</span>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+          </div>
+        </div>
+        <div class="flex bg-[#0d0d1a]">
+          <!-- Sidebar -->
+          <div class="w-36 bg-[#111128] p-3 border-r border-purple-900/30">
+            <div class="text-purple-300 font-mono text-xs font-bold mb-4">APP NAME</div>
+            <div class="space-y-1">
+              <div class="bg-purple-700/40 text-purple-200 text-xs px-2 py-1.5 font-mono cursor-pointer">📊 Dashboard</div>
+              <div class="text-gray-500 text-xs px-2 py-1.5 font-mono hover:text-gray-300 cursor-pointer transition-colors">👥 Users</div>
+              <div class="text-gray-500 text-xs px-2 py-1.5 font-mono hover:text-gray-300 cursor-pointer transition-colors">💳 Billing</div>
+              <div class="text-gray-500 text-xs px-2 py-1.5 font-mono hover:text-gray-300 cursor-pointer transition-colors">🔌 API Keys</div>
+              <div class="text-gray-500 text-xs px-2 py-1.5 font-mono hover:text-gray-300 cursor-pointer transition-colors">⚙️ Settings</div>
+            </div>
+          </div>
+          <!-- Main content -->
+          <div class="flex-1 p-4">
+            <div class="grid grid-cols-3 gap-3 mb-3">
+              <div class="bg-[#111128] border border-purple-900/30 p-3">
+                <div class="text-gray-400 font-mono text-xs mb-1">MRR</div>
+                <div class="text-white font-black text-xl">$24,800</div>
+                <div class="text-green-400 text-xs">▲ +12% this month</div>
+              </div>
+              <div class="bg-purple-700/20 border border-purple-500/30 p-3">
+                <div class="text-purple-300 font-mono text-xs mb-1">ACTIVE USERS</div>
+                <div class="text-white font-black text-xl">1,847</div>
+                <div class="text-green-400 text-xs">▲ +89 this week</div>
+              </div>
+              <div class="bg-[#111128] border border-purple-900/30 p-3">
+                <div class="text-gray-400 font-mono text-xs mb-1">CHURN</div>
+                <div class="text-white font-black text-xl">2.1%</div>
+                <div class="text-green-400 text-xs">▼ -0.4% vs last</div>
+              </div>
+            </div>
+            <!-- Chart area -->
+            <div class="bg-[#111128] border border-purple-900/30 p-3 mb-3">
+              <div class="text-gray-400 font-mono text-xs mb-2">REVENUE · 6 MONTHS</div>
+              <div class="flex items-end gap-1 h-16">
+                <div class="flex-1 bg-purple-700/40 hover:bg-purple-600/60 transition-colors cursor-pointer" style="height:40%"></div>
+                <div class="flex-1 bg-purple-700/40 hover:bg-purple-600/60 transition-colors cursor-pointer" style="height:55%"></div>
+                <div class="flex-1 bg-purple-700/40 hover:bg-purple-600/60 transition-colors cursor-pointer" style="height:48%"></div>
+                <div class="flex-1 bg-purple-700/40 hover:bg-purple-600/60 transition-colors cursor-pointer" style="height:70%"></div>
+                <div class="flex-1 bg-purple-700/40 hover:bg-purple-600/60 transition-colors cursor-pointer" style="height:85%"></div>
+                <div class="flex-1 bg-purple-500 cursor-pointer" style="height:100%"></div>
+              </div>
+              <div class="flex justify-between text-gray-600 font-mono text-xs mt-1">
+                <span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+              </div>
+            </div>
+            <!-- Recent users -->
+            <div class="bg-[#111128] border border-purple-900/30 p-3">
+              <div class="text-gray-400 font-mono text-xs mb-2">RECENT SIGNUPS</div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-2"><div class="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs">M</div><span class="text-gray-300">mihai@startup.ro</span></div>
+                  <span class="text-green-400">Pro Plan</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-2"><div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">A</div><span class="text-gray-300">alex@agency.com</span></div>
+                  <span class="text-yellow-400">Starter</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">🔐</div><div class="font-bold text-xs uppercase mb-1">Auth System</div>
+          <div class="text-on-surface-variant text-xs">JWT, OAuth, 2FA, role-based access control</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">💳</div><div class="font-bold text-xs uppercase mb-1">Billing</div>
+          <div class="text-on-surface-variant text-xs">Stripe subscriptions, invoicing, usage-based billing</div>
+        </div>
+        <div class="p-4 border border-primary bg-primary/5">
+          <div class="font-black text-xl text-primary mb-1">€8.000</div>
+          <div class="text-on-surface-variant text-xs">Starting from · 6–12 weeks</div>
+        </div>
+      </div>
+    </div>`
+  },
+  corporate: {
+    title:"Corporate Site — Enterprise Presentation",
+    html:`<div class="space-y-6">
+      <div class="border border-outline-variant overflow-hidden">
+        <div class="bg-gray-900 px-6 py-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-gray-300 font-bold">CORPORATE SITE · LIVE PREVIEW</span>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span><span class="w-2 h-2 rounded-full bg-yellow-400"></span><span class="w-2 h-2 rounded-full bg-green-400"></span></div>
+        </div>
+        <!-- Nav -->
+        <div class="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-[#3700b2] flex items-center justify-center text-white text-xs font-black">C</div>
+            <span class="font-black text-sm uppercase tracking-tight">CorpName</span>
+          </div>
+          <div class="hidden md:flex gap-4 text-xs text-gray-500">
+            <span class="cursor-pointer hover:text-[#3700b2] transition-colors">About</span>
+            <span class="cursor-pointer hover:text-[#3700b2] transition-colors">Services</span>
+            <span class="cursor-pointer hover:text-[#3700b2] transition-colors">Team</span>
+            <span class="cursor-pointer hover:text-[#3700b2] transition-colors">Blog</span>
+          </div>
+          <div class="flex gap-2 text-xs">
+            <span class="border border-gray-200 px-2 py-1 cursor-pointer">EN | RO | FR</span>
+            <span class="bg-[#3700b2] text-white px-3 py-1 cursor-pointer hover:bg-purple-700 transition-colors">Contact</span>
+          </div>
+        </div>
+        <!-- Hero -->
+        <div class="p-6 bg-gray-50 border-b border-gray-100">
+          <div class="text-xs font-mono text-[#3700b2] mb-2 uppercase tracking-widest">Enterprise Solutions</div>
+          <h2 class="font-black text-2xl uppercase tracking-tighter mb-2">Building Digital<br/><span class="text-[#3700b2]">Infrastructure</span><br/>That Scales.</h2>
+          <p class="text-gray-500 text-xs max-w-md mb-4">Enterprise-grade web solutions with CMS integration, multilingual support, and GDPR compliance built-in.</p>
+          <div class="flex gap-2">
+            <button class="bg-[#3700b2] text-white px-4 py-2 text-xs font-bold hover:bg-purple-700 transition-colors">Get in Touch</button>
+            <button class="border border-gray-300 text-gray-600 px-4 py-2 text-xs hover:border-[#3700b2] transition-colors">Our Work</button>
+          </div>
+        </div>
+        <!-- Stats -->
+        <div class="grid grid-cols-4 divide-x divide-gray-100 bg-white">
+          <div class="p-3 text-center"><div class="font-black text-lg text-[#3700b2]">50+</div><div class="text-xs text-gray-400">Clients</div></div>
+          <div class="p-3 text-center"><div class="font-black text-lg">12yrs</div><div class="text-xs text-gray-400">Experience</div></div>
+          <div class="p-3 text-center"><div class="font-black text-lg text-green-500">99.9%</div><div class="text-xs text-gray-400">Uptime</div></div>
+          <div class="p-3 text-center"><div class="font-black text-lg">4 🌍</div><div class="text-xs text-gray-400">Languages</div></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">🌍</div><div class="font-bold text-xs uppercase mb-1">Multilingual</div>
+          <div class="text-on-surface-variant text-xs">EN/RO/FR/DE + any language, auto-routing</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">📝</div><div class="font-bold text-xs uppercase mb-1">CMS Ready</div>
+          <div class="text-on-surface-variant text-xs">Non-technical team can update content easily</div>
+        </div>
+        <div class="p-4 border border-primary bg-primary/5">
+          <div class="font-black text-xl text-primary mb-1">€3.000</div>
+          <div class="text-on-surface-variant text-xs">Starting from · 4–6 weeks</div>
+        </div>
+      </div>
+    </div>`
+  },
+  portfolio: {
+    title:"Portfolio Site — Creative Showcase",
+    html:`<div class="space-y-6">
+      <div class="border border-outline-variant overflow-hidden">
+        <div class="bg-black px-6 py-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-gray-400 font-bold">PORTFOLIO · LIVE PREVIEW</span>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span><span class="w-2 h-2 rounded-full bg-yellow-400"></span><span class="w-2 h-2 rounded-full bg-green-400"></span></div>
+        </div>
+        <div class="bg-black text-white p-6">
+          <div class="flex items-center justify-between mb-8">
+            <span class="font-black text-lg uppercase tracking-tighter">JOHN DOE®</span>
+            <div class="flex gap-4 text-xs text-gray-400">
+              <span class="hover:text-white cursor-pointer transition-colors">Work</span>
+              <span class="hover:text-white cursor-pointer transition-colors">About</span>
+              <span class="border border-white/30 px-3 py-1 hover:bg-white hover:text-black cursor-pointer transition-colors">Work With Us</span>
+            </div>
+          </div>
+          <div class="mb-6">
+            <div class="text-xs font-mono text-purple-400 mb-2">Creative Developer · Designer</div>
+            <h2 class="font-black text-4xl uppercase tracking-tighter leading-none mb-3">Crafting<br/><span class="text-purple-400">Digital</span><br/>Experiences.</h2>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="aspect-video bg-gray-900 border border-gray-800 overflow-hidden group cursor-pointer hover:border-purple-500 transition-colors">
+              <div class="w-full h-full bg-gradient-to-br from-purple-900/50 to-blue-900/50 flex items-center justify-center">
+                <span class="text-purple-300 text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+              </div>
+            </div>
+            <div class="aspect-video bg-purple-900/20 border border-purple-800/30 overflow-hidden group cursor-pointer hover:border-purple-500 transition-colors">
+              <div class="w-full h-full bg-gradient-to-br from-purple-600/30 to-pink-600/20 flex items-center justify-center">
+                <span class="text-purple-300 text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+              </div>
+            </div>
+            <div class="aspect-video bg-gray-900 border border-gray-800 overflow-hidden group cursor-pointer hover:border-purple-500 transition-colors">
+              <div class="w-full h-full bg-gradient-to-br from-blue-900/50 to-teal-900/30 flex items-center justify-center">
+                <span class="text-purple-300 text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">✨</div><div class="font-bold text-xs uppercase mb-1">Motion Rich</div>
+          <div class="text-on-surface-variant text-xs">Page transitions, hover effects, scroll animations</div>
+        </div>
+        <div class="p-4 border border-outline-variant bg-surface-container-low">
+          <div class="text-lg mb-1">🌙</div><div class="font-bold text-xs uppercase mb-1">Dark / Light</div>
+          <div class="text-on-surface-variant text-xs">Auto-switching theme with preference memory</div>
+        </div>
+        <div class="p-4 border border-primary bg-primary/5">
+          <div class="font-black text-xl text-primary mb-1">€800</div>
+          <div class="text-on-surface-variant text-xs">Starting from · 2–4 weeks</div>
+        </div>
+      </div>
+    </div>`
+  }
+};
+
+// ── PROJECT MODALS (Portfolio) ────────────────────
+const projects = {
+  titan: { title:"01 — Titan Protocol", tag:"Fintech / Backend Scalability", year:"2024", stack:"Next.js · PostgreSQL · Redis · Stripe", desc:"Enterprise financial dashboard processing 8,000+ daily transactions with real-time risk scoring, portfolio analytics, and compliance reporting. Built for a Swiss fintech startup.", metrics:[{l:"Transactions/day",v:"8,291"},{l:"Load time",v:"0.6s"},{l:"Uptime",v:"99.9%"},{l:"Data points",v:"10M+"}] },
+  ether: { title:"02 — Ether Engine", tag:"E-Commerce / Real-time Inventory", year:"2024", stack:"React · Node.js · MongoDB · Stripe", desc:"Custom fashion storefront with real-time inventory sync, advanced filtering, wishlist, multi-currency checkout, and vendor analytics dashboard.", metrics:[{l:"Products",v:"4,200+"},{l:"Conversion",v:"+34%"},{l:"Load time",v:"0.8s"},{l:"Uptime",v:"99.8%"}] },
+  monolith: { title:"03 — Monolith OS", tag:"Design System / Component Library", year:"2024", stack:"React · Storybook · Figma · TypeScript", desc:"Complete design system with 120+ components, design tokens, motion guidelines, and accessibility standards. Used by 3 enterprise clients.", metrics:[{l:"Components",v:"120+"},{l:"Tokens",v:"340+"},{l:"Accessibility",v:"WCAG AA"},{l:"Bundle",v:"12kb"}] },
+  hyperion: { title:"04 — Hyperion Core", tag:"Aerospace Logistics Dashboard", year:"2025", stack:"React · WebSockets · D3.js · AWS", desc:"Mission-critical aerospace logistics platform tracking 247 active flights in real-time. 60fps data visualization, zero-latency alerts, and geo-fencing capabilities.", metrics:[{l:"Active flights",v:"247"},{l:"Latency",v:"<1ms"},{l:"Refresh",v:"60fps"},{l:"Data points",v:"10M+"}] },
+  atlas: { title:"05 — Atlas Global", tag:"Logistics / Geo-Fencing", year:"2025", stack:"Vue.js · Mapbox · Node.js · PostgreSQL", desc:"Global shipment tracking platform with live geo-fencing, customs alerts, delivery ETAs, and carrier API integrations across 40+ countries.", metrics:[{l:"Active routes",v:"124"},{l:"On-time rate",v:"97.2%"},{l:"Countries",v:"40+"},{l:"API calls/day",v:"500k"}] },
+  nexus: { title:"06 — Nexus Learn", tag:"EdTech / LMS Platform", year:"2024", stack:"Next.js · PostgreSQL · WebRTC · Stripe", desc:"Full LMS platform with live streaming, course progress tracking, certificate generation, and integrated payment system. Hosts 200+ courses.", metrics:[{l:"Students",v:"12,400"},{l:"Courses",v:"200+"},{l:"Live viewers",v:"2,847"},{l:"Completion",v:"78%"}] },
+  medicore: { title:"07 — MediCore", tag:"HealthTech / Patient Portal", year:"2025", stack:"React · Node.js · PostgreSQL · HL7", desc:"HIPAA-compliant patient portal with appointment scheduling, prescription management, real-time vitals tracking, and secure doctor-patient messaging.", metrics:[{l:"Patients",v:"5,200+"},{l:"HIPAA",v:"Compliant"},{l:"Uptime",v:"99.99%"},{l:"Response",v:"<200ms"}] },
+  vendo: { title:"08 — Vendo Prime", tag:"E-Commerce / Multi-vendor", year:"2024", stack:"Next.js · PostgreSQL · Stripe Connect · Redis", desc:"Multi-vendor marketplace with independent vendor dashboards, split payments via Stripe Connect, automated shipping integrations, and admin moderation tools.", metrics:[{l:"Vendors",v:"340+"},{l:"Products",v:"18,000+"},{l:"Revenue/mo",v:"$420k"},{l:"Orders/day",v:"890"}] }
+};
+
+function openProject(id) {
+  const p = projects[id];
+  if (!p) return;
+  document.getElementById('templateTitle').textContent = p.title;
+  document.getElementById('templateContent').innerHTML = `
+    <div class="space-y-6">
+      <div class="flex flex-wrap gap-4 items-start">
+        <div class="flex-1">
+          <span class="sec-label block mb-2">${p.tag}</span>
+          <p class="text-on-surface-variant text-sm leading-relaxed">${p.desc}</p>
+        </div>
+        <div class="text-right">
+          <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mb-1">Year</div>
+          <div class="font-black text-2xl">${p.year}</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        ${p.metrics.map(m=>`<div class="p-4 border border-outline-variant bg-surface-container-low text-center"><div class="font-black text-xl text-primary">${m.v}</div><div class="font-mono text-xs text-on-surface-variant uppercase mt-1">${m.l}</div></div>`).join('')}
+      </div>
+      <div class="p-4 border border-outline-variant bg-surface-container-low">
+        <div class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mb-2">Tech Stack</div>
+        <div class="flex flex-wrap gap-2">
+          ${p.stack.split(' · ').map(s=>`<span class="px-3 py-1 bg-primary text-white font-mono text-xs">${s}</span>`).join('')}
+        </div>
+      </div>
+      <div class="p-6 bg-primary/5 border border-primary/20">
+        <p class="font-mono text-xs text-on-surface-variant uppercase tracking-widest mb-2">Want something similar?</p>
+        <p class="text-sm text-on-surface-variant mb-4">We can build a custom solution tailored to your exact requirements. Let's discuss your project.</p>
+        <a href="#contact" onclick="closeTemplate()" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 font-label text-xs uppercase tracking-widest hover:bg-primary-container transition-colors">
+          Start Your Project <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+    </div>`;
+  document.getElementById('templateModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── CURRENT STATE ────────────────────────────────
+let currentLang = 'en';
+let testimonialIndex = 0;
+let testimonialCount = 4;
+
+// ── LANG SWITCHER ────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (i18n[lang] && i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.textContent.trim().toLowerCase() === lang) btn.classList.add('active');
+  });
+  document.documentElement.lang = lang;
+}
+
+// ── DARK MODE ────────────────────────────────────
+function toggleDark() {
+  document.documentElement.classList.toggle('dark');
+  const icon = document.getElementById('darkIcon');
+  icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+}
+
+// ── MOBILE MENU ──────────────────────────────────
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ── SCROLL PROGRESS ──────────────────────────────
+window.addEventListener('scroll', () => {
+  const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('scrollProgress').style.width = scrolled + '%';
+});
+
+// ── FAQ ──────────────────────────────────────────
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const content = item.querySelector('.faq-content');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-content').classList.remove('open');
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    content.classList.add('open');
+  }
+}
+
+// ── TESTIMONIALS ─────────────────────────────────
+function updateTestimonial() {
+  const track = document.getElementById('testimonialTrack');
+  const itemsPerView = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+  const maxIndex = testimonialCount - itemsPerView;
+  if (testimonialIndex > maxIndex) testimonialIndex = 0;
+  if (testimonialIndex < 0) testimonialIndex = maxIndex;
+  const pct = (100 / itemsPerView) * testimonialIndex;
+  track.style.transform = `translateX(-${pct}%)`;
+  const dots = document.getElementById('testimonialDots');
+  dots.innerHTML = '';
+  for (let i = 0; i <= maxIndex; i++) {
+    const d = document.createElement('button');
+    d.className = `w-2 h-2 transition-all ${i === testimonialIndex ? 'bg-primary w-6' : 'bg-outline-variant'}`;
+    d.onclick = () => { testimonialIndex = i; updateTestimonial(); };
+    dots.appendChild(d);
+  }
+}
+function nextTestimonial() { testimonialIndex++; updateTestimonial(); }
+function prevTestimonial() { testimonialIndex--; updateTestimonial(); }
+window.addEventListener('resize', updateTestimonial);
+updateTestimonial();
+
+// ── SERVICE PILLS ────────────────────────────────
+document.querySelectorAll('.srv-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.srv-pill').forEach(b => {
+      b.classList.remove('bg-primary','text-white','border-primary');
+    });
+    btn.classList.add('bg-primary','text-white','border-primary');
+    document.getElementById('c-service').value = btn.dataset.value;
+  });
+});
+document.querySelectorAll('.bgt-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bgt-pill').forEach(b => {
+      b.classList.remove('bg-secondary','text-white','border-secondary');
+    });
+    btn.classList.add('bg-secondary','text-white','border-secondary');
+    document.getElementById('c-budget').value = btn.dataset.value;
+  });
+});
+
+// ── TEMPLATE MODAL ───────────────────────────────
+function openTemplate(type) {
+  const tmpl = templates[type];
+  if (!tmpl) return;
+  document.getElementById('templateTitle').textContent = tmpl.title;
+  document.getElementById('templateContent').innerHTML = tmpl.html;
+  document.getElementById('templateModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeTemplate() {
+  document.getElementById('templateModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+document.getElementById('templateModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('templateModal')) closeTemplate();
+});
+
+// ── CONTACT FORM ─────────────────────────────────
+document.getElementById('mainContactForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name    = document.getElementById('c-name').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const details = document.getElementById('c-details').value.trim();
+  const gdpr    = document.getElementById('c-gdpr').checked;
+  const errorDiv = document.getElementById('contactError');
+
+  if (!name || !email || !details || !gdpr) {
+    errorDiv.textContent = !gdpr ? (currentLang==='ro' ? 'Acceptă politica de confidențialitate.' : 'Please accept the privacy policy.') : (currentLang==='ro' ? 'Completează câmpurile obligatorii.' : 'Please fill in all required fields.');
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errorDiv.textContent = currentLang==='ro' ? 'Email invalid.' : 'Invalid email address.';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  errorDiv.classList.add('hidden');
+
+  const btn = document.getElementById('contactSubmitBtn');
+  const btnText = document.getElementById('contactBtnText');
+  const spinner = document.getElementById('contactSpinner');
+  btn.disabled = true;
+  btnText.textContent = '...';
+  spinner.classList.remove('hidden');
+
+  try {
+    const res = await fetch('/submit', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name, email,
+        phone:    document.getElementById('c-phone').value.trim(),
+        business: document.getElementById('c-business').value.trim(),
+        service:  document.getElementById('c-service').value,
+        budget:   document.getElementById('c-budget').value,
+        details,
+        source:   'Main Website',
+      })
+    });
+    if (!res.ok) throw new Error();
+    document.getElementById('mainContactForm').reset();
+    document.querySelectorAll('.srv-pill,.bgt-pill').forEach(p => p.classList.remove('bg-primary','text-white','border-primary','bg-secondary','border-secondary'));
+    document.getElementById('c-service').value = '';
+    document.getElementById('c-budget').value = '';
+    const modal = document.getElementById('successModal');
+    modal.style.display = 'flex';
+  } catch {
+    errorDiv.textContent = currentLang==='ro' ? 'Eroare la trimitere. Încearcă din nou.' : 'Submission error. Please try again.';
+    errorDiv.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btnText.dataset.key = 'form_submit';
+    btnText.textContent = i18n[currentLang]['form_submit'];
+    spinner.classList.add('hidden');
+  }
+});
+
+// ── SMOOTH NAV ACTIVE STATE ───────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('a.nav-link');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.remove('text-primary','border-b-2','border-primary');
+        if (link.getAttribute('href') === '#'+entry.target.id) {
+          link.classList.add('text-primary');
+        }
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+
+// Init
+setLang('en');
+</script>
+
+</body>
+</html>
+
+```
